@@ -24,15 +24,6 @@ def generate_launch_description():
         #         'respawn_mavros': LaunchConfiguration('respawn_mavros'),
         #     }.items()
         # ),
-        IncludeLaunchDescription(
-            FrontendLaunchDescriptionSource(
-                os.path.join(
-                    get_package_share_directory('mavros'), 
-                    'launch', 
-                    'px4.launch'
-                )
-            )
-        ),
 
         # Static transform publishers
         Node(
