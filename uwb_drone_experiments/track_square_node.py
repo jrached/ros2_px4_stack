@@ -40,7 +40,7 @@ GLOBAL_NAVIGATION = 1  # lat/lon/alt
 NAVIGATION_MODES = [LOCAL_NAVIGATION, GLOBAL_NAVIGATION]
 
 
-from offboard_node import OffboardPathFollower
+from .offboard_node import OffboardPathFollower
 
 
 class SquarePathFollower(OffboardPathFollower):
