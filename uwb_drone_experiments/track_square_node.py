@@ -82,6 +82,7 @@ class SquarePathFollower(OffboardPathFollower):
         self.track_setpoints(setpoints)
 
 def main():
+    rclpy.init()
     node_name = "square_path_follower"
     path_follower = SquarePathFollower(
         node_name=node_name, navigation_mode=LOCAL_NAVIGATION
