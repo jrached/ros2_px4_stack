@@ -15,13 +15,16 @@ def generate_launch_description():
         DeclareLaunchArgument('respawn_mavros', default_value='false'),
 
         # Include the mavros launch file
-        IncludeLaunchDescription(
+        # IncludeLaunchDescription(
+        #     [os.path.join(get_package_share_directory('mavros'), 'launch', 'px4.launch')],
+        #     launch_arguments={
+        #         'fcu_url': LaunchConfiguration('fcu_url'),
+        #         'tgt_system': LaunchConfiguration('tgt_system'),
+        #         'respawn_mavros': LaunchConfiguration('respawn_mavros'),
+        #     }.items()
+        # ),
+                IncludeLaunchDescription(
             [os.path.join(get_package_share_directory('mavros'), 'launch', 'px4.launch')],
-            launch_arguments={
-                'fcu_url': LaunchConfiguration('fcu_url'),
-                'tgt_system': LaunchConfiguration('tgt_system'),
-                'respawn_mavros': LaunchConfiguration('respawn_mavros'),
-            }.items()
         ),
 
         # Static transform publishers
