@@ -12,6 +12,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', ['launch/mocap_offboard.launch']),
         ('share/' + package_name + '/launch', ['launch/mocap_offboard.launch.py']),
+        ('share/' + package_name + '/launch', ['launch/offboard_square_example.launch.py']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
