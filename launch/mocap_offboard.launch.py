@@ -23,7 +23,7 @@ def generate_launch_description():
         #         'respawn_mavros': LaunchConfiguration('respawn_mavros'),
         #     }.items()
         # ),
-                IncludeLaunchDescription(
+        IncludeLaunchDescription(
             [os.path.join(get_package_share_directory('mavros'), 'launch', 'px4.launch')],
         ),
 
