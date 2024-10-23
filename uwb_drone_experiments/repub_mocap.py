@@ -25,7 +25,7 @@ class MocapRepublisher(Node):
 
         # get the current namespace
         # NAMESPACE = self.get_namespace()
-        NAMESPACE = '/NX01/'
+        NAMESPACE = '/PX01/'
 
         self.mocap_sub_topic_name = self.declare_parameter(
             # "~mocap_sub_topic_name", "/optitrack" + NAMESPACE + "world"

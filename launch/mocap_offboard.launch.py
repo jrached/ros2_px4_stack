@@ -8,9 +8,9 @@ import os
 def generate_launch_description():
     return LaunchDescription([
         # Declare launch arguments
-        DeclareLaunchArgument('hostname', default_value='juanrached'),
+        DeclareLaunchArgument('hostname', default_value='nuc1'),
         DeclareLaunchArgument('tgt_system', default_value='1.1'),
-        DeclareLaunchArgument('ns', default_value='NX01'),
+        DeclareLaunchArgument('ns', default_value='PX01'),
         DeclareLaunchArgument('fcu_url', default_value='/dev/ttyACM0:921600'),
         DeclareLaunchArgument('respawn_mavros', default_value='false'),
 
