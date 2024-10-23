@@ -14,7 +14,7 @@ def generate_launch_description():
         DeclareLaunchArgument('fcu_url', default_value='/dev/ttyACM0:921600'),
         DeclareLaunchArgument('respawn_mavros', default_value='false'),
 
-        Include the mavros launch file
+        # Include the mavros launch file
         IncludeLaunchDescription(
             [os.path.join(get_package_share_directory('mavros'), 'launch', 'px4.launch.py')],
             launch_arguments={
