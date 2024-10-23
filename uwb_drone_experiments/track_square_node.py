@@ -81,11 +81,13 @@ class SquarePathFollower(OffboardPathFollower):
         setpoints = self._pack_into_setpoints(vertices)
         self.track_setpoints(setpoints)
 
-
-if __name__ == "__main__":
+def main():
     node_name = "square_path_follower"
     path_follower = SquarePathFollower(
         node_name=node_name, navigation_mode=LOCAL_NAVIGATION
     )
 
     path_follower.track_square(side_length=2.5, altitude=1.6)
+
+if __name__ == "__main__":
+    main()
