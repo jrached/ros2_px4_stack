@@ -27,7 +27,7 @@ from mavros_msgs.srv import (
     WaypointClear,
     WaypointPush,
 )
-from mavros_msgs.srv import CommandBool, SetMode, #SetModeRequest, CommandBoolRequest
+from mavros_msgs.srv import CommandBool, SetMode #SetModeRequest, CommandBoolRequest
 from sensor_msgs.msg import NavSatFix, Imu
 from pymavlink import mavutil
 
