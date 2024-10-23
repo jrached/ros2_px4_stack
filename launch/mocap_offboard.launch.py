@@ -4,7 +4,6 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from launch.launch_description_sources import FrontendLaunchDescriptionSource
-from launch.substitutions import GetPackageShareDirectory
 import os
 
 def generate_launch_description():
@@ -28,7 +27,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             FrontendLaunchDescriptionSource(
                 os.path.join(
-                    GetPackageShareDirectory('mavros'), 
+                    get_package_share_directory('mavros'), 
                     'launch', 
                     'px4.launch'
                 )
