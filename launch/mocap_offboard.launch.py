@@ -16,7 +16,7 @@ def generate_launch_description():
 
         # Include the mavros launch file
         IncludeLaunchDescription(
-            [os.path.join(get_package_share_directory('mavros'), 'launch', 'px4.launch.py')],
+            [os.path.join(get_package_share_directory('mavros'), 'launch', 'px4.launch')],
             launch_arguments={
                 'fcu_url': LaunchConfiguration('fcu_url'),
                 'tgt_system': LaunchConfiguration('tgt_system'),
