@@ -24,7 +24,13 @@ def generate_launch_description():
         #     }.items()
         # ),
         IncludeLaunchDescription(
-            [os.path.join(get_package_share_directory('mavros'), 'launch', 'px4.launch')],
+            FrontendLaunchDescriptionSource(
+                os.path.join(
+                    GetPackageShareDirectory('mavros'), 
+                    'launch', 
+                    'px4.launch'
+                )
+            )
         ),
 
         # Static transform publishers
