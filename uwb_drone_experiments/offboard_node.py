@@ -8,6 +8,7 @@ Be careful because the function is blocking and ros might yell at you
 """
 
 import rclpy
+from rclpy.qos import QosProfile, DurabilityPolicy
 from rclpy.node import Node
 import math
 from threading import Thread
@@ -61,6 +62,9 @@ class OffboardPathFollower(BasicMavrosInterface):
             self.navigation_mode in NAVIGATION_MODES
         ), f"Invalid navigation mode: {self.navigation_mode}"
 
+        qos_profile = QoSProfile(depth=10)
+        qos_profile.durability = DurabilityPolicy.TRANSIENT_LOCAL
+
         self.current_setpoint = None
         self.setpoint_publish_thread = Thread(
             target=self._publish_current_setpoint, args=()
@@ -70,7 +74,7 @@ class OffboardPathFollower(BasicMavrosInterface):
 
         # set up capacity to listen for custom setpoints
         self.outside_setpoint_sub = self.create_subscription(PoseStamped,
-            "offboard/setpoint", self._outside_setpoint_callback, 10
+            "offboard/setpoint", self._outside_setpoint_callback, qos_profile
         )
         self.received_outside_setpoint = False
 

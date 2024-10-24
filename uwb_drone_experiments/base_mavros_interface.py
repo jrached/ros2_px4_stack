@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import rclpy
+from rclpy.qos import QoSProfile, DurabilityPolicy
 from rclpy.node import Node
 from rclpy.executors import ExternalShutdownException
 import math
@@ -40,6 +41,9 @@ from six.moves import xrange
 class BasicMavrosInterface(Node):
     def __init__(self, node_name="basic_mavros_interface"):
         super().__init__(node_name)
+
+        qos_profile = QosProfile(depth=10)
+        qos_profile.durability = DurabilityPolicy.TRANSIENT_LOCAL
 
         self.state = State()
         self.altitude = Altitude()
@@ -111,27 +115,27 @@ class BasicMavrosInterface(Node):
             raise e
 
         # ROS subscribers
-        self.state_sub = self.create_subscription(State, "mavros/state", self.state_callback, 10)
+        self.state_sub = self.create_subscription(State, "mavros/state", self.state_callback, qos_profile)
         self.alt_sub = self.create_subscription(Altitude,
-            "mavros/altitude", self.altitude_callback, 10
+            "mavros/altitude", self.altitude_callback, qos_profile
         )
         self.ext_state_sub = self.create_subscription(ExtendedState,
-            "mavros/extended_state", self.extended_state_callback, 10
+            "mavros/extended_state", self.extended_state_callback, qos_profile
         )
         self.global_pos_sub = self.create_subscription(NavSatFix,
-            "mavros/global_position/global", self.global_position_callback, 10
+            "mavros/global_position/global", self.global_position_callback, qos_profile
         )
         self.imu_data_sub = self.create_subscription(Imu,
-            "mavros/imu/data", self.imu_data_callback, 10
+            "mavros/imu/data", self.imu_data_callback, qos_profile
         )
         self.home_pos_sub = self.create_subscription(HomePosition,
-            "mavros/home_position/home", self.home_position_callback, 10
+            "mavros/home_position/home", self.home_position_callback, qos_profile
         )
         self.local_pos_sub = self.create_subscription(PoseStamped,
-            "mavros/local_position/pose", self.local_position_callback, 10
+            "mavros/local_position/pose", self.local_position_callback, qos_profile
         )
         self.mission_wp_sub = self.create_subscription(WaypointList,
-            "mavros/mission/waypoints", self.mission_wp_callback, 10
+            "mavros/mission/waypoints", self.mission_wp_callback, qos_profile
         )
 
         # ROS publishers
