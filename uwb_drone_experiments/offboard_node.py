@@ -215,7 +215,7 @@ class OffboardPathFollower(BasicMavrosInterface):
 def main():
     rclpy.init()
     node_name = "offboard_path_follower"
-    path_follower = OffboardPathFollower(
+    node = OffboardPathFollower(
         node_name=node_name, navigation_mode=LOCAL_NAVIGATION
     )
     rclpy.spin(node)
