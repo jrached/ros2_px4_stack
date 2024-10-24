@@ -195,7 +195,7 @@ class OffboardPathFollower(BasicMavrosInterface):
         setpoints = [
             PoseStamped(
                 header=Header(
-                    stamp=self.get_clock().now(),
+                    stamp=self.get_clock().now().to_msg(),
                     frame_id="map",
                 ),
                 pose=Pose(
