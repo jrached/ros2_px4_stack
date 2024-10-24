@@ -205,10 +205,10 @@ class OffboardPathFollower(BasicMavrosInterface):
                         z=point[2],
                     ),
                     orientation=Quaternion(
-                        x=0,
-                        y=0,
-                        z=0,
-                        w=1,
+                        x=0.0,
+                        y=0.0,
+                        z=0.0,
+                        w=1.0,
                     ),
                 ),
             )
