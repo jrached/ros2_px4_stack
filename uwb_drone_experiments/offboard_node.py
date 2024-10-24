@@ -8,7 +8,7 @@ Be careful because the function is blocking and ros might yell at you
 """
 
 import rclpy
-from rclpy.qos import QosProfile, DurabilityPolicy
+from rclpy.qos import QoSProfile, DurabilityPolicy
 from rclpy.node import Node
 import math
 from threading import Thread
