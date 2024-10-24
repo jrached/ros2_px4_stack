@@ -63,7 +63,7 @@ class OffboardPathFollower(BasicMavrosInterface):
         ), f"Invalid navigation mode: {self.navigation_mode}"
 
         qos_profile = QoSProfile(depth=10)
-        qos_profile.durability = DurabilityPolicy.TRANSIENT_LOCAL
+        qos_profile.durability = DurabilityPolicy.VOLATILE
         qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
 
         self.current_setpoint = None

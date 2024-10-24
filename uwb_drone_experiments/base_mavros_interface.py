@@ -43,7 +43,7 @@ class BasicMavrosInterface(Node):
         super().__init__(node_name)
 
         qos_profile = QoSProfile(depth=10)
-        qos_profile.durability = DurabilityPolicy.TRANSIENT_LOCAL
+        qos_profile.durability = DurabilityPolicy.VOLATILE
         qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
 
         self.state = State()
