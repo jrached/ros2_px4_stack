@@ -70,7 +70,7 @@ class OffboardPathFollower(BasicMavrosInterface):
 
         # set up capacity to listen for custom setpoints
         self.outside_setpoint_sub = self.create_subscription(PoseStamped,
-            "offboard/setpoint", self._outside_setpoint_callback
+            "offboard/setpoint", self._outside_setpoint_callback, 10
         )
         self.received_outside_setpoint = False
 
