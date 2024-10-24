@@ -111,31 +111,31 @@ class BasicMavrosInterface(Node):
             raise e
 
         # ROS subscribers
-        self.state_sub = self.create_subscription(State, "mavros/state", self.state_callback)
+        self.state_sub = self.create_subscription(State, "mavros/state", self.state_callback, 10)
         self.alt_sub = self.create_subscription(Altitude,
-            "mavros/altitude", self.altitude_callback
+            "mavros/altitude", self.altitude_callback, 10
         )
         self.ext_state_sub = self.create_subscription(ExtendedState,
-            "mavros/extended_state", self.extended_state_callback
+            "mavros/extended_state", self.extended_state_callback, 10
         )
         self.global_pos_sub = self.create_subscription(NavSatFix,
-            "mavros/global_position/global", self.global_position_callback
+            "mavros/global_position/global", self.global_position_callback, 10
         )
         self.imu_data_sub = self.create_subscription(Imu,
-            "mavros/imu/data", self.imu_data_callback
+            "mavros/imu/data", self.imu_data_callback, 10
         )
         self.home_pos_sub = self.create_subscription(HomePosition,
-            "mavros/home_position/home", self.home_position_callback
+            "mavros/home_position/home", self.home_position_callback, 10
         )
         self.local_pos_sub = self.create_subscription(PoseStamped,
-            "mavros/local_position/pose", self.local_position_callback
+            "mavros/local_position/pose", self.local_position_callback, 10
         )
         self.mission_wp_sub = self.create_subscription(WaypointList,
-            "mavros/mission/waypoints", self.mission_wp_callback
+            "mavros/mission/waypoints", self.mission_wp_callback, 10
         )
 
         # ROS publishers
-        self.mavlink_pub = self.create_publisher(Mavlink, "mavlink/to", queue_size=1)
+        self.mavlink_pub = self.create_publisher(Mavlink, "mavlink/to", 1)
         self.setpoint_position_pub = self.create_publisher(PoseStamped,
             "mavros/setpoint_position/local", 1
         )
