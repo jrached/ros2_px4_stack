@@ -76,20 +76,36 @@ class BasicMavrosInterface(Node):
         service_timeout = 10
         self.get_logger().info("waiting for ROS services")
         try:
-            while not self.get_param_srv.wait_for_service(service_timeout):
-                self.get_logger().info('get_param not available, waiting again...')
-            while not self.set_param_srv.wait_for_service(service_timeout):
-                self.get_logger().info('set_param not available, waiting again...')
-            while not self.set_arming_srv.wait_for_service(service_timeout):
-                self.get_logger().info('set_arming not available, waiting again...')
-            while not self.set_mode_srv.wait_for_service(service_timeout):
-                self.get_logger().info('set_mode not available, waiting again...')
-            while not self.wp_clear_srv.wait_for_service(service_timeout):
-                self.get_logger().info('wp_clear not available, waiting again...')
-            while not self.wp_push_srv.wait_for_service(service_timeout):
-                self.get_logger().info('wp_push not available, waiting again...')
+            if self.get_param_srv.wait_for_service(service_timeout):
+                self.get_logger().info('get_param service is up!')
+            else:
+                self.get_logger().info('get_param not available, proceeding without it...')
 
-            self.get_logger().info("ROS services are up")
+            if self.set_param_srv.wait_for_service(service_timeout):
+                self.get_logger().info('set_param service is up!')
+            else:
+                self.get_logger().info('set_param not available, proceeding without it...')
+
+            if self.set_arming_srv.wait_for_service(service_timeout):
+                self.get_logger().info('set_arming service is up!')
+            else:
+                self.get_logger().info('set_arming not available, proceeding without it...')
+
+            if self.set_mode_srv.wait_for_service(service_timeout):
+                self.get_logger().info('set_mode service is up!')
+            else:
+                self.get_logger().info('set_mode not available, proceeding without it...')
+
+            if self.wp_clear_srv.wait_for_service(service_timeout):
+                self.get_logger().info('wp_clear service is up!')
+            else:
+                self.get_logger().info('wp_clear not available, proceeding without it...')
+
+            if self.wp_push_srv.wait_for_service(service_timeout):
+                self.get_logger().info('wp_push service is up!')
+            else:
+                self.get_logger().info('wp_push not available, proceeding without it...')
+
         except rclpy.ROSException as e:
             self.get_logger.error(e)
             raise e
