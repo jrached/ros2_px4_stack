@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 import rclpy
-from rclpy.qos import QoSProfile, DurabilityPolicy
+from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy
 from rclpy.node import Node
 from rclpy.executors import ExternalShutdownException
 import math
@@ -44,6 +44,7 @@ class BasicMavrosInterface(Node):
 
         qos_profile = QoSProfile(depth=10)
         qos_profile.durability = DurabilityPolicy.TRANSIENT_LOCAL
+        qos_profile.reliability = ReliabilityPolicy.RELIABLE
 
         self.state = State()
         self.altitude = Altitude()

@@ -8,7 +8,7 @@ Be careful because the function is blocking and ros might yell at you
 """
 
 import rclpy
-from rclpy.qos import QoSProfile, DurabilityPolicy
+from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy
 from rclpy.node import Node
 import math
 from threading import Thread
@@ -64,6 +64,7 @@ class OffboardPathFollower(BasicMavrosInterface):
 
         qos_profile = QoSProfile(depth=10)
         qos_profile.durability = DurabilityPolicy.TRANSIENT_LOCAL
+        qos_profile.reliability = ReliabilityPolicy.RELIABLE
 
         self.current_setpoint = None
         self.setpoint_publish_thread = Thread(
