@@ -64,7 +64,7 @@ class OffboardPathFollower(BasicMavrosInterface):
 
         qos_profile = QoSProfile(depth=10)
         qos_profile.durability = DurabilityPolicy.TRANSIENT_LOCAL
-        qos_profile.reliability = ReliabilityPolicy.RELIABLE
+        qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
 
         self.current_setpoint = None
         self.setpoint_publish_thread = Thread(
