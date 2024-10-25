@@ -81,6 +81,10 @@ class OffboardPathFollower(BasicMavrosInterface):
         )
         self.received_outside_setpoint = False
 
+        # Timer variables
+        self.timer1_start = self.get_clock().now()
+        self.timer2_start = self.get_clock().now()
+
     def _outside_setpoint_callback(self, msg: PoseStamped):
         self.current_setpoint = msg
         self.received_outside_setpoint = True
@@ -106,34 +110,40 @@ class OffboardPathFollower(BasicMavrosInterface):
 
         self.get_logger().info("HERE 4")
 
-        rate1 = self.create_rate(1)
-        rate2 = self.create_rate(1/0.2)
+        # rate1 = self.create_rate(1)
+        # rate2 = self.create_rate(1/0.2)
         # wait 1 second for FCU connection
         # rclpy.sleep(1)
         self.wait_for_seconds(1)
         # rate1.sleep()
 
-        self.get_logger().info("HERE 5")
-        last_time = self.get_clock().now()
+        #Wait 1 second for FCU connection 
+        if (self.get_clock().now() - self.timer1_start).nanoseconds > 1e9:
 
-        while rclpy.ok():
-            # if 1 second has passed, move to the next setpoint
-            # if (rclpy.Time.now() - last_time).to_sec() > 1:
-            #     last_time = rclpy.Time.now()
-            #     cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
+            self.get_logger().info("HERE 5")
+            # last_time = self.get_clock().now()
 
-            # if we've reached the current setpoint, move to the next one,
-            # looping back to the first one if necessary
-            if self.setpoint_reached(setpoints[cur_setpoint_idx]):
-                cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
+            while rclpy.ok():
+                # if 1 second has passed, move to the next setpoint
+                # if (rclpy.Time.now() - last_time).to_sec() > 1:
+                #     last_time = rclpy.Time.now()
+                #     cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
 
-            self.current_setpoint = setpoints[cur_setpoint_idx]
-            # rclpy.loginfo(f"Current setpoint: {self.current_setpoint}")
+                # if we've reached the current setpoint, move to the next one,
+                # looping back to the first one if necessary
+                if (self.get_clock().now() - self.timer2_start).nanoseconds > 0.2 * 1e9: 
+                    if self.setpoint_reached(setpoints[cur_setpoint_idx]):
+                        cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
 
-            # rclpy.sleep(0.2)
-            # self.wait_for_seconds(0.2)
-            # rate2.sleep()
-            self.get_logger().info("HERE 6")
+                    self.current_setpoint = setpoints[cur_setpoint_idx]
+                    # rclpy.loginfo(f"Current setpoint: {self.current_setpoint}")
+
+                    # rclpy.sleep(0.2)
+                    # self.wait_for_seconds(0.2)
+                    # rate2.sleep()
+                    self.get_logger().info("HERE 6")
+                    self.timer2_start = self.get_clock().now()
+                self.timer1_start = self.get_clock().now()
 
     # Method to wait for FCU connection 
     def wait_for_seconds(self, seconds):
