@@ -131,7 +131,7 @@ class OffboardPathFollower(BasicMavrosInterface):
             # rclpy.loginfo(f"Current setpoint: {self.current_setpoint}")
 
             # rclpy.sleep(0.2)
-            # self.wait_for_seconds(0.2)
+            self.wait_for_seconds(0.2)
             # rate2.sleep()
             self.get_logger().info("HERE 6")
 
