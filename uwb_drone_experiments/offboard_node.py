@@ -111,7 +111,7 @@ class OffboardPathFollower(BasicMavrosInterface):
         # wait 1 second for FCU connection
         # rclpy.sleep(1)
         # self.wait_for_seconds(1)
-        rate1.sleep()
+        # rate1.sleep()
 
         self.get_logger().info("HERE 5")
         last_time = self.get_clock().now()
