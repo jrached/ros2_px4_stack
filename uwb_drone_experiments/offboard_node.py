@@ -73,6 +73,8 @@ class OffboardPathFollower(BasicMavrosInterface):
         self.setpoint_publish_thread.daemon = True
         self.setpoint_publish_thread.start()
 
+        self.get_logger().info("HERE 2")
+
         # set up capacity to listen for custom setpoints
         self.outside_setpoint_sub = self.create_subscription(PoseStamped,
             "offboard/setpoint", self._outside_setpoint_callback, qos_profile
