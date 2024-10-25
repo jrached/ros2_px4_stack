@@ -104,6 +104,8 @@ class OffboardPathFollower(BasicMavrosInterface):
         cur_setpoint_idx = 0
         self.current_setpoint = setpoints[cur_setpoint_idx]
 
+        self.get_logger().info("HERE 4")
+
         rate1 = self.create_rate(1)
         rate2 = self.create_rate(1/0.2)
         # wait 1 second for FCU connection
