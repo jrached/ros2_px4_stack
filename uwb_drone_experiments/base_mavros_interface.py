@@ -149,8 +149,6 @@ class BasicMavrosInterface(Node):
             "mavros/setpoint_position/local", qos_profile
         )
 
-        self.get_logger().info("HERE 3")
-
         # need to simulate heartbeat to prevent datalink loss detection
         self.hb_mav_msg = mavutil.mavlink.MAVLink_heartbeat_message(
             mavutil.mavlink.MAV_TYPE_GCS, 0, 0, 0, 0, 0

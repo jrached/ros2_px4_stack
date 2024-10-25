@@ -73,8 +73,6 @@ class OffboardPathFollower(BasicMavrosInterface):
         self.setpoint_publish_thread.daemon = True
         self.setpoint_publish_thread.start()
 
-        self.get_logger().info("HERE 2")
-
         # set up capacity to listen for custom setpoints
         self.outside_setpoint_sub = self.create_subscription(PoseStamped,
             "offboard/setpoint", self._outside_setpoint_callback, qos_profile
@@ -105,7 +103,6 @@ class OffboardPathFollower(BasicMavrosInterface):
         cur_setpoint_idx = 0
         self.current_setpoint = setpoints[cur_setpoint_idx]
 
-        self.get_logger().info("HERE 4")
 
         # rate1 = self.create_rate(1)
         # rate2 = self.create_rate(1/0.2)
@@ -113,12 +110,8 @@ class OffboardPathFollower(BasicMavrosInterface):
         # rclpy.sleep(1)
         self.wait_for_seconds(1)
         # rate1.sleep()
-
-        #Wait 1 second for FCU connection 
     
-
-        self.get_logger().info("HERE 5")
-        last_time = self.get_clock().now()
+        # last_time = self.get_clock().now()
 
         while rclpy.ok():
             # if 1 second has passed, move to the next setpoint
@@ -137,7 +130,6 @@ class OffboardPathFollower(BasicMavrosInterface):
             # rclpy.sleep(0.2)
             self.wait_for_seconds(0.2)
             # rate2.sleep()
-            self.get_logger().info(f"Time elapsed {(self.get_clock().now() - last_time).nanoseconds / 1e9}")
 
     # Method to wait for FCU connection 
     def wait_for_seconds(self, seconds):

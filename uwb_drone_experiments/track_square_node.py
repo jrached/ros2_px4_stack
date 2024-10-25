@@ -66,7 +66,6 @@ class SquarePathFollower(OffboardPathFollower):
         )
 
 
-        self.get_logger().info("HERE 0")
         self.get_logger().info(
             f"Tracking square of side length {side_length} at altitude {altitude}"
         )
@@ -82,7 +81,6 @@ class SquarePathFollower(OffboardPathFollower):
 
         setpoints = self._pack_into_setpoints(vertices)
         self.track_setpoints(setpoints)
-        self.get_logger().info("HERE 1")
 
 def main():
     rclpy.init()
