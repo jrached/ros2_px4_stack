@@ -140,9 +140,13 @@ class BasicMavrosInterface(Node):
         )
 
         # ROS publishers
-        self.mavlink_pub = self.create_publisher(Mavlink, "mavlink/to", 1)
+        # self.mavlink_pub = self.create_publisher(Mavlink, "mavlink/to", 1)
+        # self.setpoint_position_pub = self.create_publisher(PoseStamped,
+        #     "mavros/setpoint_position/local", 1
+        # )
+        self.mavlink_pub = self.create_publisher(Mavlink, "mavlink/to", qos_profile)
         self.setpoint_position_pub = self.create_publisher(PoseStamped,
-            "mavros/setpoint_position/local", 1
+            "mavros/setpoint_position/local", qos_profile
         )
 
         self.get_logger().info("HERE 3")
