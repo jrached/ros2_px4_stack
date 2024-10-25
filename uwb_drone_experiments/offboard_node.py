@@ -131,7 +131,7 @@ class OffboardPathFollower(BasicMavrosInterface):
 
                 # if we've reached the current setpoint, move to the next one,
                 # looping back to the first one if necessary
-                if (self.get_clock().now() - self.timer2_start).nanoseconds > 0.2 * 1e9: 
+                if (self.get_clock().now() - self.timer2_start).nanoseconds > 0.1 * 1e9: 
                     if self.setpoint_reached(setpoints[cur_setpoint_idx]):
                         cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
 
