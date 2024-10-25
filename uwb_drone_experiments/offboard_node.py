@@ -141,7 +141,7 @@ class OffboardPathFollower(BasicMavrosInterface):
                     # rclpy.sleep(0.2)
                     # self.wait_for_seconds(0.2)
                     # rate2.sleep()
-                    self.get_logger().info(f"Time elapsed {(self.get_clock().now() - self.timer2_start) / 1e9}")
+                    self.get_logger().info(f"Time elapsed {(self.get_clock().now() - self.timer2_start).nanoseconds / 1e9}")
                     self.timer2_start = self.get_clock().now()
                 self.timer1_start = self.get_clock().now()
 
