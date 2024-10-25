@@ -113,6 +113,7 @@ class OffboardPathFollower(BasicMavrosInterface):
         # self.wait_for_seconds(1)
         rate1.sleep()
 
+        self.get_logger().info("HERE 5")
         last_time = self.get_clock().now()
 
         while rclpy.ok():
@@ -132,6 +133,7 @@ class OffboardPathFollower(BasicMavrosInterface):
             # rclpy.sleep(0.2)
             # self.wait_for_seconds(0.2)
             rate2.sleep()
+            self.get_logger().info("HERE 6")
 
     # Method to wait for FCU connection 
     def wait_for_seconds(self, seconds):
