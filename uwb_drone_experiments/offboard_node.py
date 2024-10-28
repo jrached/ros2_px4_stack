@@ -118,24 +118,80 @@ class OffboardPathFollower(BasicMavrosInterface):
     
         # last_time = self.get_clock().now()
 
-        taking_off = True
-        while taking_off: 
-            #Creates takeoff setpoint
-            takeoff_vertices = [(self.local_position.pose.position.x, self.local_position.pose.position.y, altitude)]
-            takeoff_setpoints = self._pack_into_setpoints(takeoff_vertices)
-            #Sets current setpoint to takeoff (this gets published in publish_current_setpoint())
-            self.current_setpoint = takeoff_setpoints[0]
-            #If reached setpoint finish takeoff procedure and break
-            if self.setpoint_reached(takeoff_setpoints[0]):
-                taking_off = False
-                break
-            self.wait_for_seconds(0.2)
+        flight_state = 0
+        completed_laps, max_laps = 0, 2
+        while rclpy.ok():
+            if flight_state == 0: 
+                #Creates takeoff setpoint
+                takeoff_vertices = [(self.local_position.pose.position.x, self.local_position.pose.position.y, altitude)]
+                takeoff_setpoints = self._pack_into_setpoints(takeoff_vertices)
+                #Sets current setpoint to takeoff (this gets published in publish_current_setpoint())
+                self.current_setpoint = takeoff_setpoints[0]
 
+                #If takeoff complete move onto the next state
+                if self.setpoint_reached(takeoff_setpoints[0]):
+                    flight_state = 1
+                    cur_setpoint_idx = 0
+                    self.current_setpoint = setpoints[cur_setpoint_idx]
+        
+            elif flight_state == 1:
+                # if 1 second has passed, move to the next setpoint
+                # if (rclpy.Time.now() - last_time).to_sec() > 1:
+                #     last_time = rclpy.Time.now()
+                #     cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
+
+                # if we've reached the current setpoint, move to the next one,
+                # looping back to the first one if necessary 
+                if self.setpoint_reached(setpoints[cur_setpoint_idx]):
+                    cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
+                    
+                    # If lap completed
+                    if setpoints[cur_setpoint_idx] == setpoints[0]:
+                        completed_laps += 1 
+
+                self.current_setpoint = setpoints[cur_setpoint_idx]
+                # rclpy.loginfo(f"Current setpoint: {self.current_setpoint}")
+
+                # If laps complete move back to takeoff side
+                if completed_laps >= max_laps:
+                    flight_state = 2
+
+            elif flight_state == 2:
+                self.current_setpoint = takeoff_setpoints[0]
+            
+            # rclpy.sleep(0.2)
+            self.wait_for_seconds(0.2)
+            # rate2.sleep()
+
+    def track_setpoints_og(self, setpoints: List[PoseStamped]):
+        # This mode requires position or pose/attitude information - e.g. GPS, optical flow, visual-inertial odometry, mocap, etc.
+        # RC control is disabled except to change modes (you can also fly without any manual controller at all by setting the parameter COM_RC_IN_MODE to 4: Stick input disabled).
+        # The vehicle must be already be receiving a stream of MAVLink setpoint messages or ROS 2 OffboardControlMode messages before arming in offboard mode or switching to offboard mode when flying.
+        # The vehicle will exit offboard mode if MAVLink setpoint messages or OffboardControlMode are not received at a rate of > 2Hz.
+        # Not all coordinate frames and field values allowed by MAVLink are supported for all setpoint messages and vehicles. Read the sections below carefully to ensure only supported values are used.
+
+        """NOTE
+        -The vehicle must be already be receiving a stream of MAVLink setpoint messages or ROS 2 OffboardControlMode messages before arming in offboard mode or switching to offboard mode when flying.
+        -The vehicle will exit offboard mode if MAVLink setpoint messages or OffboardControlMode are not received at a rate of > 2Hz.
+        -Not all coordinate frames and field values allowed by MAVLink are supported for all setpoint messages and vehicles. Read the sections below carefully to ensure only supported values are used.
+        """
+        if self.received_outside_setpoint:
+            self.get_logger().error("Received outside setpoint. Ignoring track_setpoints command")
+            return
 
         cur_setpoint_idx = 0
         self.current_setpoint = setpoints[cur_setpoint_idx]
 
-        completed_laps, max_laps = 0, 2
+
+        # rate1 = self.create_rate(1)
+        # rate2 = self.create_rate(1/0.2)
+        # wait 1 second for FCU connection
+        # rclpy.sleep(1)
+        self.wait_for_seconds(1)
+        # rate1.sleep()
+    
+        # last_time = self.get_clock().now()
+
         while rclpy.ok():
             # if 1 second has passed, move to the next setpoint
             # if (rclpy.Time.now() - last_time).to_sec() > 1:
@@ -146,25 +202,13 @@ class OffboardPathFollower(BasicMavrosInterface):
             # looping back to the first one if necessary 
             if self.setpoint_reached(setpoints[cur_setpoint_idx]):
                 cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
-                
-                # If lap completed
-                if setpoints[cur_setpoint_idx] == setpoints[0]:
-                    completed_laps += 1 
 
             self.current_setpoint = setpoints[cur_setpoint_idx]
             # rclpy.loginfo(f"Current setpoint: {self.current_setpoint}")
 
-            if completed_laps >= max_laps:
-                break
-
             # rclpy.sleep(0.2)
             self.wait_for_seconds(0.2)
             # rate2.sleep()
-
-        while rclpy.ok():
-            self.current_setpoint = takeoff_setpoints[0]
-            self.wait_for_seconds(0.2)
-
 
     # Method to wait for FCU connection 
     def wait_for_seconds(self, seconds):
