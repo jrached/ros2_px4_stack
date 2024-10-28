@@ -80,7 +80,7 @@ class SquarePathFollower(OffboardPathFollower):
         ]
 
         setpoints = self._pack_into_setpoints(vertices)
-        self.track_setpoints(setpoints)
+        self.track_setpoints(setpoints, altitude)
 
 def main():
     rclpy.init()
