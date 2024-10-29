@@ -79,15 +79,6 @@ class OffboardPathFollower(BasicMavrosInterface):
         )
         self.received_outside_setpoint = False
 
-        # Create a subscription for getting current pose
-        self.local_position_sub_ = self.create_subscription(PoseStamped, '/mavros/local_position/pose', self.get_local_position, qos_profile)
-        self.local_position = None
-
-    def get_local_position(self, msg):
-        self.local_position = msg
-        # self.get_logger().info(f'FROM OFFBOARD: Local position is : ({self.local_position.pose.position.x}, {self.local_position.pose.position.y}, {self.local_position.pose.position.z})')
-        
-
     def _outside_setpoint_callback(self, msg: PoseStamped):
         self.current_setpoint = msg
         self.received_outside_setpoint = True
@@ -108,23 +99,16 @@ class OffboardPathFollower(BasicMavrosInterface):
             self.get_logger().error("Received outside setpoint. Ignoring track_setpoints command")
             return
 
-
-        # rate1 = self.create_rate(1)
-        # rate2 = self.create_rate(1/0.2)
         # wait 1 second for FCU connection
-        # rclpy.sleep(1)
         self.wait_for_seconds(1)
-        # rate1.sleep()
-    
-        # last_time = self.get_clock().now()
 
-        flight_state = 0
-        completed_laps, max_laps = 0, 2
+        flight_state, completed_laps, max_laps = 0, 0, 2
         while rclpy.ok():
             if flight_state == 0: 
                 #Creates takeoff setpoint
                 takeoff_vertices = [(self.local_position.pose.position.x, self.local_position.pose.position.y, altitude)]
                 takeoff_setpoints = self._pack_into_setpoints(takeoff_vertices)
+               
                 #Sets current setpoint to takeoff (this gets published in publish_current_setpoint())
                 self.current_setpoint = takeoff_setpoints[0]
 
@@ -135,33 +119,27 @@ class OffboardPathFollower(BasicMavrosInterface):
                     self.current_setpoint = setpoints[cur_setpoint_idx]
         
             elif flight_state == 1:
-                # if 1 second has passed, move to the next setpoint
-                # if (rclpy.Time.now() - last_time).to_sec() > 1:
-                #     last_time = rclpy.Time.now()
-                #     cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
-
                 # if we've reached the current setpoint, move to the next one,
                 # looping back to the first one if necessary 
                 if self.setpoint_reached(setpoints[cur_setpoint_idx]):
                     cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
                     
-                    # If lap completed
+                    # If lap completed increase lap counter
                     if setpoints[cur_setpoint_idx] == setpoints[0]:
                         completed_laps += 1 
 
                 self.current_setpoint = setpoints[cur_setpoint_idx]
-                # rclpy.loginfo(f"Current setpoint: {self.current_setpoint}")
 
-                # If laps complete move back to takeoff side
+                # If all laps complete move back to takeoff side
                 if completed_laps >= max_laps:
                     flight_state = 2
 
             elif flight_state == 2:
                 self.current_setpoint = takeoff_setpoints[0]
             
-            # rclpy.sleep(0.2)
+            # Wait 0.2 seconds to publish at right frequency
             self.wait_for_seconds(0.2)
-            # rate2.sleep()
+
 
     def track_setpoints_og(self, setpoints: List[PoseStamped]):
         # This mode requires position or pose/attitude information - e.g. GPS, optical flow, visual-inertial odometry, mocap, etc.
