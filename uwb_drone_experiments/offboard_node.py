@@ -70,11 +70,21 @@ class OffboardPathFollower(BasicMavrosInterface):
         qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
 
         self.current_setpoint = None
+        self.trajectory_setpoint = None
+        
+        # Start thread for setpoint publisher 
         self.setpoint_publish_thread = Thread(
             target=self._publish_current_setpoint, args=()
-        )
+        ) 
         self.setpoint_publish_thread.daemon = True
         self.setpoint_publish_thread.start()
+
+        # Start thread for trajectory publisher 
+        self.trajectory_publish_thread = Thread(
+            target=self._publish_trajectory_setpoint, args=()
+        )
+        self.trajectory_publish_thread.daemon = True
+        self.trajectory_publish_thread.start() 
 
         # set up capacity to listen for custom setpoints
         self.outside_setpoint_sub = self.create_subscription(PoseStamped,
@@ -207,6 +217,20 @@ class OffboardPathFollower(BasicMavrosInterface):
                 and self.current_setpoint is not None
             ):
                 self.setpoint_position_pub.publish(self.current_setpoint)
+            rate.sleep()
+
+    def update_trajectory(self, point):
+        self.trajectory_setpoint = point
+
+    def _publish_trajectory_setpoint(self):
+        rate = 50 #Hz
+        rate = self.create_rate(rate)
+        while rclpy.ok():
+            if (
+                self.navigation_mode == LOCAL_NAVIGATION
+                and self.trajectory_setpoint is not None
+            ):
+                self.setpoint_traj_pub.publish(self.trajectory_setpoint)
             rate.sleep()
 
     def _pack_into_waypoints(

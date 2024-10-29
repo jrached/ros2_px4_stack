@@ -6,6 +6,7 @@ from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy
 import math
 from threading import Thread
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, Transform, Twist, Vector3
+from dynus_interfaces.msg import Goal
 from std_msgs.msg import Header
 from mavros import mavlink
 from mavros_msgs.msg import (
@@ -70,7 +71,8 @@ class SmoothTrajectoryPublisher(OffboardPathFollower):
 
     def repub_traj_cb(self, msg):
         self.new_traj = self._pack_into_traj_setpoints(msg)
-        self.new_traj_pub_.publish(self.new_traj)
+        self.update_trajectory(self.new_traj)
+        # self.new_traj_pub_.publish(self.new_traj)
         # self.get_logger().info(f"Callback is getting: {self.new_traj}")
 
     # def timer_cb(self):

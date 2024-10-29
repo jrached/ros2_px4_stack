@@ -7,6 +7,8 @@ from rclpy.executors import ExternalShutdownException
 import math
 from threading import Thread
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
+from dynus_interfaces.msg import Goal
+from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
 from std_msgs.msg import Header
 from mavros import mavlink
 from mavros_msgs.msg import (
@@ -146,7 +148,12 @@ class BasicMavrosInterface(Node):
         # )
         self.mavlink_pub = self.create_publisher(Mavlink, "mavlink/to", qos_profile)
         self.setpoint_position_pub = self.create_publisher(PoseStamped,
-            "mavros/setpoint_position/local", qos_profile
+            "mavros/setpoint_position/local", 
+            qos_profile
+        )
+        self.setpoint_traj_pub = self.create_publisher(MultiDOFJointTrajectory, 
+        "mavros/setpoint_trajectory/local", 
+        qos_profile
         )
 
         # need to simulate heartbeat to prevent datalink loss detection
