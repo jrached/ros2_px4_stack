@@ -64,22 +64,9 @@ class SmoothTrajectoryPublisher(OffboardPathFollower):
         self.new_traj = MultiDOFJointTrajectory()
         self.new_traj_pub_ = self.create_publisher(MultiDOFJointTrajectory, '/mavros/setpoint_trajectory/local', qos_profile)
 
-        # Create and start new thread
-        # self.thread = Thread(target=self.timer_cb)
-        # self.thread.start()
-
-
     def repub_traj_cb(self, msg):
         self.new_traj = self._pack_into_traj_setpoints(msg)
         self.update_trajectory(self.new_traj)
-        # self.new_traj_pub_.publish(self.new_traj)
-        # self.get_logger().info(f"Callback is getting: {self.new_traj}")
-
-    # def timer_cb(self):
-    #     rate = self.create_rate(90)
-    #     self.new_traj_pub_.publish(self.new_traj)
-    #     rate.sleep()
-        # self.get_logger().info("Nothing to see here")
 
 
 def main(args=None):
