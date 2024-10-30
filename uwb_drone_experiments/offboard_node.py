@@ -153,53 +153,43 @@ class OffboardPathFollower(BasicMavrosInterface):
             # Wait 0.2 seconds to publish at right frequency
             self.wait_for_seconds(0.2)
 
+    def takeoff_and_track_trajectory(self, altitude):
 
-    def track_setpoints_og(self, setpoints: List[PoseStamped]):
-        # This mode requires position or pose/attitude information - e.g. GPS, optical flow, visual-inertial odometry, mocap, etc.
-        # RC control is disabled except to change modes (you can also fly without any manual controller at all by setting the parameter COM_RC_IN_MODE to 4: Stick input disabled).
-        # The vehicle must be already be receiving a stream of MAVLink setpoint messages or ROS 2 OffboardControlMode messages before arming in offboard mode or switching to offboard mode when flying.
-        # The vehicle will exit offboard mode if MAVLink setpoint messages or OffboardControlMode are not received at a rate of > 2Hz.
-        # Not all coordinate frames and field values allowed by MAVLink are supported for all setpoint messages and vehicles. Read the sections below carefully to ensure only supported values are used.
-
-        """NOTE
-        -The vehicle must be already be receiving a stream of MAVLink setpoint messages or ROS 2 OffboardControlMode messages before arming in offboard mode or switching to offboard mode when flying.
-        -The vehicle will exit offboard mode if MAVLink setpoint messages or OffboardControlMode are not received at a rate of > 2Hz.
-        -Not all coordinate frames and field values allowed by MAVLink are supported for all setpoint messages and vehicles. Read the sections below carefully to ensure only supported values are used.
-        """
-        if self.received_outside_setpoint:
-            self.get_logger().error("Received outside setpoint. Ignoring track_setpoints command")
-            return
-
-        cur_setpoint_idx = 0
-        self.current_setpoint = setpoints[cur_setpoint_idx]
-
-
-        # rate1 = self.create_rate(1)
-        # rate2 = self.create_rate(1/0.2)
         # wait 1 second for FCU connection
-        # rclpy.sleep(1)
         self.wait_for_seconds(1)
-        # rate1.sleep()
-    
-        # last_time = self.get_clock().now()
 
+        flight_state = "TAKEOFF"
+        x_init, y_init = self.local_position.pose.position.x, self.local_position.pose.position.y
         while rclpy.ok():
-            # if 1 second has passed, move to the next setpoint
-            # if (rclpy.Time.now() - last_time).to_sec() > 1:
-            #     last_time = rclpy.Time.now()
-            #     cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
+            if flight_state == "TAKEOFF":
+                takeoff_point = MultiDOFJointTrajectoryPoint()
+                
+                transform = Transform()
+                transform.translation.x = x_init
+                transform.translation.y = y_init 
+                transform.translation.z = altitude
+                takeoff_point.transforms = [transform]
+                
+                twist = Twist()
+                takeoff_point.velocities = [twist]
 
-            # if we've reached the current setpoint, move to the next one,
-            # looping back to the first one if necessary 
-            if self.setpoint_reached(setpoints[cur_setpoint_idx]):
-                cur_setpoint_idx = (cur_setpoint_idx + 1) % len(setpoints)
+                takeoff_traj = MultiDOFJointTrajectory()
+                takeoff_traj.points = [takeoff_point]
 
-            self.current_setpoint = setpoints[cur_setpoint_idx]
-            # rclpy.loginfo(f"Current setpoint: {self.current_setpoint}")
+                self.trajectory_setpoint = takeoff_traj
 
-            # rclpy.sleep(0.2)
+                self.get_logger().info(f"received traj: {self.received_trajectory_setpoint}")
+
+                if (self.traj_point_reached(takeoff_traj)
+                    and self.received_trajectory_setpoint is not None
+                ):
+                    flight_state = "TRAJECTORY"
+
+            elif flight_state == "TRAJECTORY":
+                self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
+
+            # Wait 0.2 seconds to publish at right frequency
             self.wait_for_seconds(0.2)
-            # rate2.sleep()
 
     # Method to wait for FCU connection 
     def wait_for_seconds(self, seconds):
@@ -219,8 +209,9 @@ class OffboardPathFollower(BasicMavrosInterface):
                 self.setpoint_position_pub.publish(self.current_setpoint)
             rate.sleep()
 
-    def update_trajectory(self, point):
-        self.trajectory_setpoint = point
+    # def update_trajectory(self, point):
+    #     self.received_trajectory_setpoint = point #Change back!
+    #     self.get_logger().info(f"received traj: {self.received_trajectory_setpoint}")
 
     def _publish_trajectory_setpoint(self):
         rate = 50 #Hz
@@ -304,7 +295,7 @@ class OffboardPathFollower(BasicMavrosInterface):
         return setpoints
 
 
-    def _pack_into_traj_setpoints(self, point: Goal):
+    def _pack_into_traj(self, point: Goal):
         assert self.navigation_mode == LOCAL_NAVIGATION, (
             f"Invalid navigation mode: {self.navigation_mode}."
             f"Only local navigation is supported for this method"
@@ -346,7 +337,7 @@ class OffboardPathFollower(BasicMavrosInterface):
 
         )]
 
-        entire_trajectory_msg = MultiDOFJointTrajectory(
+        trajectory_msg = MultiDOFJointTrajectory(
             header=Header(
                 stamp=self.get_clock().now().to_msg(),
                 frame_id="map"
@@ -354,7 +345,7 @@ class OffboardPathFollower(BasicMavrosInterface):
             points=trajectory_points
         )
 
-        return entire_trajectory_msg
+        return trajectory_msg
 
     def yaw_to_quaternion(self, yaw):
         qx = 0.0

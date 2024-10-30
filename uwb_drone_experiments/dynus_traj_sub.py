@@ -43,10 +43,10 @@ NAVIGATION_MODES = [LOCAL_NAVIGATION, GLOBAL_NAVIGATION]
 
 from .offboard_node import OffboardPathFollower
 
-class SmoothTrajectoryPublisher(OffboardPathFollower):
+class SmoothTrajectorySubscription(OffboardPathFollower):
 
     def __init__(self, 
-        node_name: str="smooth_trajectory_publisher", 
+        node_name: str="smooth_trajectory_subscription", 
         navigation_mode: int=LOCAL_NAVIGATION
     ):
 
@@ -60,20 +60,15 @@ class SmoothTrajectoryPublisher(OffboardPathFollower):
         self.traj_topic = '/NX01/goal'
         self.create_subscription(Goal, self.traj_topic, self.repub_traj_cb, qos_profile)
 
-        # Make publisher to publish new traj
-        self.new_traj = MultiDOFJointTrajectory()
-        self.new_traj_pub_ = self.create_publisher(MultiDOFJointTrajectory, '/mavros/setpoint_trajectory/local', qos_profile)
-
     def repub_traj_cb(self, msg):
-        self.new_traj = self._pack_into_traj_setpoints(msg)
+        self.new_traj = self._pack_into_traj(msg)
         self.update_trajectory(self.new_traj)
-
 
 def main(args=None):
     rclpy.init(args=args)
-    trajectory_publisher = SmoothTrajectoryPublisher()
-    rclpy.spin(trajectory_publisher)
-    trajectory_publisher.destroy_node()
+    trajectory_subscription = SmoothTrajectorySubscription()
+    rclpy.spin(trajectory_subscription)
+    trajectory_subscription.destroy_node()
     rclpy.shutdown()
 
 if __name__ == '__main__':

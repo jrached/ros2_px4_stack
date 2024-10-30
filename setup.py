@@ -12,6 +12,8 @@ setup(
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', ['launch/mocap_offboard.launch.py']),
         ('share/' + package_name + '/launch', ['launch/offboard_square_example.launch.py']),
+        ('share/' + package_name + '/launch', ['launch/dynus_mavros.launch.py']),
+
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -31,7 +33,8 @@ setup(
             'repub_mocap = uwb_drone_experiments.repub_mocap:main',
             'spoofed_mocap = uwb_drone_experiments.spoofed_mocap:main',
             'track_square_node = uwb_drone_experiments.track_square_node:main',
-            'repub_dynus_traj = uwb_drone_experiments.repub_dynus_traj:main',
+            'dynus_traj_sub = uwb_drone_experiments.dynus_traj_sub:main',
+            'track_dynus_traj = uwb_drone_experiments.track_dynus_traj:main',
         ],
     },
 )

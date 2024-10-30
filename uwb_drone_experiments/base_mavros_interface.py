@@ -57,6 +57,7 @@ class BasicMavrosInterface(Node):
         self.local_position = PoseStamped()
         self.mission_wp = WaypointList()
         self.mav_type = None
+        self.received_trajectory_setpoint = None
 
         self.sub_topics_ready = {
             key: False
@@ -140,6 +141,10 @@ class BasicMavrosInterface(Node):
         self.mission_wp_sub = self.create_subscription(WaypointList,
             "mavros/mission/waypoints", self.mission_wp_callback, qos_profile
         )
+        
+        # Dynus subscriptions
+        self.traj_topic = '/NX01/goal'
+        self.dynus_traj_sub = self.create_subscription(Goal, self.traj_topic, self.repub_traj_cb, qos_profile)
 
         # ROS publishers
         # self.mavlink_pub = self.create_publisher(Mavlink, "mavlink/to", 1)
@@ -180,6 +185,10 @@ class BasicMavrosInterface(Node):
     #
     # Callback functions
     #
+    def repub_traj_cb(self, msg):
+        self.received_trajectory_setpoint = msg
+
+
     def altitude_callback(self, data):
         self.altitude = data
 
@@ -450,6 +459,25 @@ class BasicMavrosInterface(Node):
             <= tolerance
         )
         return x_reached and y_reached and z_reached
+
+
+    def traj_point_reached(self, traj: MultiDOFJointTrajectory, tolerance: float = 0.1) -> bool:
+        point = traj.points[0]
+        transform = point.transforms[0]
+
+        x_reached = (
+            abs(self.local_position.pose.position.x - transform.translation.x)
+            <= tolerance
+        )
+        y_reached = (
+            abs(self.local_position.pose.position.y - transform.translation.y)
+            <= tolerance
+        )
+        z_reached = (
+            abs(self.local_position.pose.position.z - transform.translation.z)
+            <= tolerance
+        )
+        return x_reached and y_reached and z_reached 
 
     def wait_for_landed_state(self, desired_landed_state, timeout, index):
         self.get_logger().info(
