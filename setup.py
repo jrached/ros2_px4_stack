@@ -33,7 +33,6 @@ setup(
             'repub_mocap = uwb_drone_experiments.repub_mocap:main',
             'spoofed_mocap = uwb_drone_experiments.spoofed_mocap:main',
             'track_square_node = uwb_drone_experiments.track_square_node:main',
-            'dynus_traj_sub = uwb_drone_experiments.dynus_traj_sub:main',
             'track_dynus_traj = uwb_drone_experiments.track_dynus_traj:main',
         ],
     },
