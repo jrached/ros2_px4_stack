@@ -20,12 +20,6 @@ def generate_launch_description():
             output='screen',
         ),
         Node(
-            package='uwb_drone_experiments',
-            executable='dynus_traj_sub',
-            name='dynus_traj_sub_py',
-            output='screen',
-        ),
-        Node(
             package='tf2_ros',
             executable='static_transform_publisher',
             name='mocap_to_mavros_tf',
