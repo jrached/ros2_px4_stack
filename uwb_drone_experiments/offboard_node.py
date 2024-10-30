@@ -186,6 +186,12 @@ class OffboardPathFollower(BasicMavrosInterface):
             elif flight_state == "TRAJECTORY":
                 self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
 
+                if (self.count_publishers(self.traj_topic) == 0):
+                    flight_state = "RETURN"
+            
+            elif flight_state == "RETURN":
+                self.trajectory_setpoint = takeoff_traj
+
             self.wait_for_seconds(0.2)
 
     # Method to wait for FCU connection 
