@@ -178,8 +178,6 @@ class OffboardPathFollower(BasicMavrosInterface):
 
                 self.trajectory_setpoint = takeoff_traj
 
-                self.get_logger().info(f"received traj: {self.received_trajectory_setpoint}")
-
                 if (self.traj_point_reached(takeoff_traj)
                     and self.received_trajectory_setpoint is not None
                 ):
