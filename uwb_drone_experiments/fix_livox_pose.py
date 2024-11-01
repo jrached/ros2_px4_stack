@@ -2,11 +2,15 @@
 
 import rclpy 
 from rclpy.node import Node 
-
+from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy
 from geometry_msgs.msg import PoseStamped
-
-import tf_transformations
 import math
+
+from tf2_ros.static_transform_broadcaster import StaticTransformBroadcaster
+from tf2_ros import Buffer, TransformListener 
+from tf2_geometry_msgs import do_transform_pose 
+
+import numpy as np 
 
 class FixLivoxPose(Node):
 
@@ -18,37 +22,66 @@ class FixLivoxPose(Node):
         qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
 
 
+        self.spoof_pose = PoseStamped()
+        self.spoof_pose.header.frame_id = "base_link"
+        self.spoof_pose.pose.position.x = 0.0
+        self.spoof_pose.pose.position.y = 0.0
+        self.spoof_pose.pose.position.z = 0.0
+
+        # Make pose subscription
         self.subscription = self.create_subscription(PoseStamped, 
         "/dlio/odom_node/pose", self.pose_callback, qos_profile)
 
+        # Make pose publisher 
         self.publisher = self.create_publisher(PoseStamped, 
         "/livox/pose", qos_profile)
+
+        # Make transform listener
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
     
     def pose_callback(self, pose_msg):
-        rotated_pose = self.rotate_pose(pose_msg, 135.0)
-        self.publisher.publish(rotated_pose)
+        new_pose = self.apply_transform(pose_msg)
+        self.publisher.publish(new_pose)
 
-    def rotate_pose(self, pose, angle_deg):
-        # Convert degrees to radians
-        angle_rad = math.radians(angle_deg)
+    def apply_transform(self, in_pose):    
+        # Get static transform between PX01 and base_link
+        pose_stamped = PoseStamped()
+        pose_stamped.pose = in_pose
+        if not self.tf_buffer.can_transform("PX01", "base_link", self.get_clock().now()):
+            self.get_logger().info(f"Waiting for transform")
+            rclpy.spin_once(self, timeout_sec=1.0)
 
-        # Create a quaternion for the rotation around the z-axis
-        quaternion = tf_transformations.quaternion_from_euler(0, 0, -angler_rad)
+        self.get_logger().info(f"in_pose: {pose_stamped}")
+        transform = self.tf_buffer.lookup_transform('PX01', 'base_link', self.get_clock().now())
 
-        # Create a new PoseStamped for the rotated pose
-        rotated_pose = pose
-        rotated_pose.pose.orientation.x = quaternion[0]
-        rotated_pose.pose.orientation.y = quaternion[1]
-        rotated_pose.pose.orientation.z = quaternion[2]
-        rotated_pose.pose.orientation.w = quaternion[3]
+        # Get PX01 pose from base_link pose (in_pose) and their relative transform
+        transformed_pose = do_transform_pose(pose_stamped, transform)
 
-        # Update position using rotation formulas
-        x = pose.pose.position.x 
-        y = pose.pose.position.y
-        rotated_pose.pose.position.x = x * math.cos(angle_rad) - y * math.sin(angle_rad)
-        rotated_pose.pose.position.y = x * math.sin(angle_rad) + y * math.cos(angle_rad)
+        return transformed_pose
 
-        return rotated_pose
+    def quaternion_from_euler(self, ai, aj, ak):
+        ai /= 2.0
+        aj /= 2.0
+        ak /= 2.0
+        ci = math.cos(ai)
+        si = math.sin(ai)
+        cj = math.cos(aj)
+        sj = math.sin(aj)
+        ck = math.cos(ak)
+        sk = math.sin(ak)
+        cc = ci*ck
+        cs = ci*sk
+        sc = si*ck
+        ss = si*sk
+
+        q = np.empty((4, ))
+        q[0] = cj*sc - sj*cs
+        q[1] = cj*ss + sj*cc
+        q[2] = cj*cs - sj*sc
+        q[3] = cj*cc + sj*ss
+
+        return q
 
 def main(args=None):
     rclpy.init(args=args)
