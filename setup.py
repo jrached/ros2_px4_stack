@@ -35,6 +35,7 @@ setup(
             'track_square_node = uwb_drone_experiments.track_square_node:main',
             'track_dynus_traj = uwb_drone_experiments.track_dynus_traj:main',
             'fix_livox_pose = uwb_drone_experiments.fix_livox_pose:main',
+            'bag_to_csv = uwb_drone_experiments.bag_to_csv:main',
         ],
     },
 )

@@ -10,6 +10,8 @@ from matplotlib import pyplot as plt
 
 from transforms3d import quat2euler
 
+import pandas as pd
+
 class PlotPIDResponse(Node):
     def __init__(self):
         super().__init__("plot_pid_response")
@@ -39,6 +41,10 @@ class PlotPIDResponse(Node):
         self.measured_roll = []
         self.measured_pitch = []
 
+        # Create datasets
+        self.df1 = None
+        self.df2 = None 
+
     def bag1_cb(self, msg):
         timestamp = msg.header.stamp
         att = msg.pose.orientation
@@ -58,6 +64,8 @@ class PlotPIDResponse(Node):
             self.setpoint_roll.append(roll)
             self.setpoint_pitch.append(pitch)
 
+            
+
     
     def bag2_cb(self, msg):
         timestamp = msg.hader.stamp
@@ -68,6 +76,8 @@ class PlotPIDResponse(Node):
         qw = att.w
 
         roll, pitch, yaw = euler_from_quaternion(qx, qy, qz, qw)
+
+
 
         self.measured_timestamp.append(timestamp)
         self.measured_roll.append(roll)
