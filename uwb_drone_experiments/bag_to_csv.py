@@ -8,6 +8,7 @@ import pandas as pd
 
 from mavros_msgs.msg import AttitudeTarget
 from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import Header
 
 from transforms3d.euler import quat2euler
 
@@ -45,17 +46,18 @@ def read_bag_to_csv(bag_path, topic_name, output_csv):
         (topic, data, timestamp) = reader.read_next()
         
         if topic == topic_name:
-            header = deserialize_messgae(data, Header)
+            header = deserialize_message(data, Header)
             msg = deserialize_message(data, msg_type)
             nanosecs = header.stamp.nanosec
 
-            roll, pitch, yaw = get_euler(msg)
+            # roll, pitch, yaw = get_euler(msg)
 
             data_list.append({
-                'nanoseconds': nanosecs,
                 'timestamp': timestamp,
-                'roll': roll,
-                'pitch': pitch
+                'nanoseconds': nanosecs,
+                'x': msg.pose.position.x,
+                'y': msg.pose.position.y,
+                'z': msg.pose.position.z
             })
 
     # Convert to a DataFrame and write to CSV
@@ -75,15 +77,15 @@ def get_euler(msg):
 
 def main():
     # Use the function
-    bag_path = '/home/juanrached/mavros_ws/bags/pid_response_1/rosbag2_2024_11_04-16_58_54'
+    bag_path = '/home/juanrached/mavros_ws/bags/pid_response_2/rosbag2_2024_11_05-16_54_20'
     
-    topic_name1 = '/mavros/setpoint_raw/target_attitude'
-    output_csv1 = '/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response/att_setpoints.csv'
+    topic_name1 = '/mavros/setpoint_position/local'
+    output_csv1 = '/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response2/pos_setpoints.csv'
     
     topic_name2 = '/mavros/local_position/pose'
-    output_csv2 = '/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response/att_measured.csv'
+    output_csv2 = '/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response2/pos_measured.csv'
 
-    read_bag_to_csv(bag_path, topic_name2, output_csv2)
+    read_bag_to_csv(bag_path, topic_name1, output_csv1)
 
 if __name__ == '__main__':
     main()
