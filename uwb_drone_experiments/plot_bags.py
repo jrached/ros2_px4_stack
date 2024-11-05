@@ -8,7 +8,7 @@ from geometry_msgs.msg import PoseStamped
 
 from matplotlib import pyplot as plt 
 
-from transforms3d import quat2euler
+from transforms3d.euler import quat2euler
 
 import pandas as pd
 

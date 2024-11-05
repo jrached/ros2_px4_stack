@@ -45,11 +45,14 @@ def read_bag_to_csv(bag_path, topic_name, output_csv):
         (topic, data, timestamp) = reader.read_next()
         
         if topic == topic_name:
+            header = deserialize_messgae(data, Header)
             msg = deserialize_message(data, msg_type)
+            nanosecs = header.stamp.nanosec
 
             roll, pitch, yaw = get_euler(msg)
 
             data_list.append({
+                'nanoseconds': nanosecs,
                 'timestamp': timestamp,
                 'roll': roll,
                 'pitch': pitch
