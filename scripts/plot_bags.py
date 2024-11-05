@@ -8,6 +8,8 @@ from geometry_msgs.msg import PoseStamped
 
 from matplotlib import pyplot as plt 
 
+from transforms3d import quat2euler
+
 class PlotPIDResponse(Node):
     def __init__(self):
         super().__init__("plot_pid_response")
@@ -16,17 +18,17 @@ class PlotPIDResponse(Node):
         self.bag2_is_published = False
 
         # Make subscriptions
-        bag1_type = None #TODO
-        bag1_topic = ""
+        bag1_type = PoseStamped #TODO verify it is PoseStamped
+        bag1_topic = "/mavros/local_position/pose"
         self.bag1_subscription = self.create_subscription(bag1_type, bag1_topic, self.bag1_cb, 10)
 
-        bag2_type = None #TODO
-        bag2_topic = ""
-        self.bag2_subscription = self.create_subscription(bag2_type, bag2_topic, self.bag2_cb, 10)
+        self.bag2_type = None #TODO
+        self.bag2_topic = "/mavros/setpoint_raw/target_attitude"
+        self.bag2_subscription = self.create_subscription(self.bag2_type, self.bag2_topic, self.bag2_cb, 10)
 
-        plot_type = String()
-        plot_topic = "/plot_bags"
-        self.plot_subscription = self.create_subscription(plot_type, plot_topic, self.plot_cb, 10)
+        self.plot_type = String
+        self.plot_topic = "/plot_bags"
+        self.plot_subscription = self.create_subscription(self.plot_type, self.plot_topic, self.plot_cb, 10)
 
         # Declare data arrays
         self.setpoint_timestamp = []
@@ -47,8 +49,9 @@ class PlotPIDResponse(Node):
 
         roll, pitch, yaw = euler_from_quaternion(qx, qy, qz, qw)
         
-        #TODO define bag_2_publisher_count (there's a method for it)
-        self.bag2_is_published = len(bag_2_publisher_count) > 0 
+        bag2_publisher_count = len(self.get_publisher_info_by_topic(self.bag2_topic))
+
+        self.bag2_is_published = bag_2_publisher_count > 0 
 
         if self.bag2_is_published:
             self.setpoint_timestamp.append(timestamp)
@@ -79,9 +82,8 @@ class PlotPIDResponse(Node):
             continue 
 
 
-#TODO: write function 
 def euler_from_quaternion(qx, qy, qz, qw):
-    pass
+    return quat2euler([qw, qx, qy, qz], axes='sxyz')
 
 
 def main(args=None):
