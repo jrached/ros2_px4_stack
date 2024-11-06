@@ -58,17 +58,35 @@ def plot_y_response(arr1, arr2):
     plt.ylabel("y-component")    
     plt.show()
 
+def plot_roll(arr1, arr2):
+    plt.plot(arr1[:, 0], arr1[:, 2], arr2[:, 2])
+    plt.title("Roll Response")
+    plt.legend(["Response", "Setpoint"])
+    plt.xlabel("time")
+    plt.ylabel("roll")
+    plt.show()
+
+def plot_pitch(arr1, arr2):
+    plt.plot(arr1[:, 0], arr1[:, 3], arr2[:, 3])
+    plt.title("Pitch Response")
+    plt.legend(["Response", "Setpoint"])
+    plt.xlabel("time")
+    plt.ylabel("pitch")
+    plt.show()
 
 if __name__ == "__main__":
-    path1 = "/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response2/pos_measured.csv"
-    path2 = "/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response2/pos_setpoints.csv"
+    path1 = "/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_7/vel_measured.csv"
+    path2 = "/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_7/vel_setpoints.csv"
 
     arr1 = from_csv_to_numpy(path1)
     arr2 = from_csv_to_numpy(path2)
     
     new_arr1, new_arr2 = sync_timestamps(arr1, arr2)
 
-    plot_x_response(new_arr1, new_arr2)
-    plot_y_response(new_arr1, new_arr2)
+    print(new_arr1[0,0])
+    print(new_arr2[0,0])
+    # plot_x_response(new_arr1, new_arr2)
+    # plot_y_response(new_arr1, new_arr2)
 
-    
+    # plot_roll(new_arr1, new_arr2)
+    # plot_pitch(new_arr1, new_arr2)
