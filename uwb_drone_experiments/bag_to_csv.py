@@ -6,8 +6,8 @@ from rosbag2_py import SequentialReader, StorageOptions, ConverterOptions
 from rosidl_runtime_py.utilities import get_message
 import pandas as pd
 
-from mavros_msgs.msg import AttitudeTarget
-from geometry_msgs.msg import PoseStamped
+from mavros_msgs.msg import AttitudeTarget, PositionTarget
+from geometry_msgs.msg import PoseStamped, TwistStamped
 from std_msgs.msg import Header
 
 from transforms3d.euler import quat2euler
@@ -107,14 +107,24 @@ def vel_bag_to_csv(bag_path, topic_name, output_csv):
             nanosecs = header.stamp.nanosec
 
             # roll, pitch, yaw = get_euler(msg)
-
-            data_list.append({
-                'timestamp': timestamp,
-                'nanoseconds': nanosecs,
-                'x': msg.twist.linear.x,
-                'y': msg.twist.linear.y,
-                'z': msg.twist.linear.z
-            })
+            if isinstance(msg, TwistStamped):
+                data_list.append({
+                    'timestamp': timestamp,
+                    'nanoseconds': nanosecs,
+                    'x': msg.twist.linear.x,
+                    'y': msg.twist.linear.y,
+                    'z': msg.twist.linear.z
+                })
+            elif isinstance(msg, PositionTarget):
+                data_list.append({
+                    'timestamp': timestamp,
+                    'nanoseconds': nanosecs,
+                    'x': msg.velocity.x,
+                    'y': msg.velocity.y,
+                    'z': msg.velocity.z
+                })
+            else:
+                raise Exception(f"Did not expect topic of type {topic_type}")
 
     # Convert to a DataFrame and write to CSV
     df = pd.DataFrame(data_list)
@@ -179,44 +189,43 @@ def att_bag_to_csv(bag_path, topic_name, output_csv):
     rclpy.shutdown()
 
 def get_euler(msg):
-    # qx = msg.pose.orientation.x  
-    # qy = msg.pose.orientation.y
-    # qz = msg.pose.orientation.z
-    # qw = msg.pose.orientation.w
+    if isinstance(msg, PoseStamped):
+        pose = msg.pose
+    elif isinstance(msg, AttitudeTarget):
+        pose = msg
+    else:
+        raise Exception(f"Did not expect topic of type {type(msg)}")
 
-    # For target attitude message:
-    #TODO: Add if statement that checks type
-    qx = msg.orientation.x  
-    qy = msg.orientation.y
-    qz = msg.orientation.z
-    qw = msg.orientation.w
+    qx = pose.orientation.x  
+    qy = pose.orientation.y
+    qz = pose.orientation.z
+    qw = pose.orientation.w
 
     return quat2euler([qw, qx, qy, qz], axes='sxyz')
 
 def main():
-    # Use the function
-    att_bag_path = '/home/juanrached/mavros_ws/bags/pid_response_1/rosbag2_2024_11_04-16_58_54'
-    pos_and_att_bag_path = '/home/juanrached/mavros_ws/bags/pid_response_7/rosbag2_2024_11_06-16_39_22'
+    # att_bag_path = '/home/juanrached/mavros_ws/bags/pid_response_1/rosbag2_2024_11_04-16_58_54'
+    # pos_and_att_bag_path = '/home/juanrached/mavros_ws/bags/pid_response_7/rosbag2_2024_11_06-16_39_22'
 
+    # New #############################################################################################################
     topic_name1 = '/mavros/setpoint_position/local'
-    output_csv1 = '/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_5/pos_setpoints.csv'
-    
     topic_name2 = '/mavros/local_position/pose'
-    output_csv2 = '/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_6/att_measured.csv'
-
     topic_name3 = '/mavros/setpoint_raw/target_attitude'
-    output_csv3 = '/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_6/att_setpoints.csv'
-
     topic_name4 = '/mavros/setpoint_raw/target_local'
-    output_csv4 = '/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_7/vel_setpoints.csv'
-
     topic_name5 = '/PX01/mocap/twist'
-    output_csv5 = '/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_7/vel_measured.csv'
+    
+    test_num = 8 
+    bag_path = f"/home/juanrached/mavros_ws/bags/pid_response_{test_num}/" #TODO add bag filename
+    output_path = f"/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_{test_num}"
 
+    pos_bag_to_csv(bag_path, topic_name2, output_path + "pos_measured.csv") 
+    pos_bag_to_csv(bag_path, topic_name1, output_path + "pos_setpoints.csv")
+    
+    vel_bag_to_csv(bag_path, topic_name5, output_path + "vel_measured.csv") 
+    vel_bag_to_csv(bag_path, topic_name4, output_path + "vel_setpoints.csv") 
 
-    vel_bag_to_csv(pos_and_att_bag_path, topic_name5, output_csv5)
-    # att_bag_to_csv(att_bag_path, topic_name3, output_csv3)
-    # pos_bag_to_csv(pos_and_att_bag_path, topic_name2, output_csv2)
+    att_bag_to_csv(bag_path, topic_name2, output_path + "att_measured.csv")  
+    att_bag_to_csv(bag_path, topic_name3, output_path + "att_setpoints.csv") 
 
 if __name__ == '__main__':
     main()
