@@ -214,9 +214,10 @@ def main():
     topic_name4 = '/mavros/setpoint_raw/target_local'
     topic_name5 = '/PX01/mocap/twist'
     
-    test_num = 8 
-    bag_path = f"/home/juanrached/mavros_ws/bags/pid_response_{test_num}/" #TODO add bag filename
-    output_path = f"/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_{test_num}"
+    test_num = 9 
+    bag_file = "rosbag2_2024_11_07-13_00_51"
+    bag_path = f"/home/juanrached/mavros_ws/bags/pid_response_{test_num}/" + bag_file
+    output_path = f"/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_{test_num}/"
 
     pos_bag_to_csv(bag_path, topic_name2, output_path + "pos_measured.csv") 
     pos_bag_to_csv(bag_path, topic_name1, output_path + "pos_setpoints.csv")

@@ -91,8 +91,8 @@ def plot_pitch(arr1, arr2):
     plt.show()
 
 if __name__ == "__main__":
-    test_num = 8
-    df_path = f"/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_{test_num}"
+    test_num = 9
+    df_path = f"/home/juanrached/mavros_ws/src/uwb_drone_experiments/data/pid_response_{test_num}/"
     pos_measured = df_path + "pos_measured.csv"
     pos_setpoints = df_path + "pos_setpoints.csv"
     vel_measured = df_path + "vel_measured.csv"
