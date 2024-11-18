@@ -30,7 +30,9 @@ Migration of uwb_drone_experiments to ros2
 3. Create a workspace:
     mkdir -p mavros_ws/src
 
-4. Inside the mavros_ws/src directory, git clone this repo
+4. Inside the mavros_ws/src directory, git clone this repo:
+
+    git clone https://github.com/jrached/uwb_drone_experiments.git
 
 
 # Running the code
