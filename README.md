@@ -49,7 +49,7 @@ Note: This code assumes some form of position estimate being published to the PX
     2. /mavros/local_position/pose
 5. On QGroundControl:
     1. Connect transmitter.
-    2. Change mode to Position.
+    2. Change mode to Offboard.
     3. Arm the vehicle.
 
 
