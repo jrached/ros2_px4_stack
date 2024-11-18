@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'uwb_drone_experiments'
+package_name = 'ros2-px4-stack'
 
 setup(
     name=package_name,
@@ -24,18 +24,18 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'base_mavros_interface = uwb_drone_experiments.base_mavros_interface:main',
-            'drone_vars = uwb_drone_experiments.drone_vars:main', 
-            'make_experiment_trajectories = uwb_drone_experiments.make_experiment_trajectories:main',
-            'my_transform_broadcaster = uwb_drone_experiments.my_transform_broadcaster:main',
-            'offboard_node = uwb_drone_experiments.offboard_node:main',
-            'publish_trajectories = uwb_drone_experiments.publish_trajectories:main',
-            'repub_mocap = uwb_drone_experiments.repub_mocap:main',
-            'spoofed_mocap = uwb_drone_experiments.spoofed_mocap:main',
-            'track_square_node = uwb_drone_experiments.track_square_node:main',
-            'track_dynus_traj = uwb_drone_experiments.track_dynus_traj:main',
-            'fix_livox_pose = uwb_drone_experiments.fix_livox_pose:main',
-            'bag_to_csv = uwb_drone_experiments.bag_to_csv:main',
+            'base_mavros_interface = ros2-px4-stack.base_mavros_interface:main',
+            'drone_vars = ros2-px4-stack.drone_vars:main', 
+            'make_experiment_trajectories = ros2-px4-stack.make_experiment_trajectories:main',
+            'my_transform_broadcaster = ros2-px4-stack.my_transform_broadcaster:main',
+            'offboard_node = ros2-px4-stack.offboard_node:main',
+            'publish_trajectories = ros2-px4-stack.publish_trajectories:main',
+            'repub_mocap = ros2-px4-stack.repub_mocap:main',
+            'spoofed_mocap = ros2-px4-stack.spoofed_mocap:main',
+            'track_square_node = ros2-px4-stack.track_square_node:main',
+            'track_dynus_traj = ros2-px4-stack.track_dynus_traj:main',
+            'fix_livox_pose = ros2-px4-stack.fix_livox_pose:main',
+            'bag_to_csv = ros2-px4-stack.bag_to_csv:main',
         ],
     },
 )

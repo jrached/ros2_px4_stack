@@ -47,7 +47,7 @@ def generate_launch_description():
 
         # Launch the repub_mocap node
         Node(
-            package='uwb_drone_experiments',
+            package='ros2-px4-stack',
             executable='repub_mocap',
             name='repub_mocap_py',
             output='screen',
@@ -57,7 +57,7 @@ def generate_launch_description():
 
         # Subscribe to broadcasted trajectories
         Node(
-            package='uwb_drone_experiments',
+            package='ros2-px4-stack',
             executable='offboard_node',
             name='offboard_node_py',
             output='screen',
