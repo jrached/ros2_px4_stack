@@ -45,8 +45,8 @@ Note: This code assumes some form of position estimate being published to the PX
     1. ros2 launch mavros px4.launch 
     2. ros2 launch uwb_drone_experiments offboard_square_example.launch.py
 4. You should be able to echo (and they should be the same):
-    /mavros/vision_pose/pose
-    /mavros/local_position/pose
+    1. /mavros/vision_pose/pose
+    2. /mavros/local_position/pose
 5. On QGroundControl:
     1. Connect transmitter.
     2. Change mode to Position.
