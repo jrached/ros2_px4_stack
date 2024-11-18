@@ -14,7 +14,7 @@ def generate_launch_description():
         DeclareLaunchArgument('fcu_url', default_value='/dev/ttyACM0:921600'),
         DeclareLaunchArgument('respawn_mavros', default_value='false'),
         Node(
-            package='ros2-px4-stack',
+            package='ros2_px4_stack',
             executable='track_dynus_traj',
             name='track_dynus_traj_py',
             output='screen',
@@ -32,7 +32,7 @@ def generate_launch_description():
             arguments=['0', '0', '0', '0', '0', '0', 'world', 'world_mocap']
         ),
         Node(
-            package='ros2-px4-stack',
+            package='ros2_px4_stack',
             executable='repub_mocap',
             name='repub_mocap_py',
             output='screen',

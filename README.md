@@ -1,4 +1,4 @@
-# ros2-px4-stack
+# ros2_px4_stack
 Migration of uwb_drone_experiments to ros2
 
 # Pixhawk Setup
