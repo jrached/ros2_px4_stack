@@ -30,7 +30,7 @@ Migration of uwb_drone_experiments to ros2
 3. Create a workspace:
     mkdir -p mavros_ws/src
 
-4. On mavros_ws/src git clone this repo
+4. Inside the mavros_ws/src directory, git clone this repo
 
 
 # Running the code
@@ -40,8 +40,8 @@ Note: This code assumes some form of position estimate being published to the PX
 1. Connect Pixhawk and Nuc through usbc
 2. Ssh into nuc
 3. Run: 
-        ros2 launch mavros px4.launch 
-        ros2 launch uwb_drone_experiments offboard_square_example.launch.py
+    1. ros2 launch mavros px4.launch 
+    2. ros2 launch uwb_drone_experiments offboard_square_example.launch.py
 4. You should be able to echo (and they should be the same):
     /mavros/vision_pose/pose
     /mavros/local_position/pose
