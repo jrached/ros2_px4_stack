@@ -7,7 +7,9 @@ from rclpy.executors import ExternalShutdownException
 import math
 from threading import Thread
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
-from dynus_interfaces.msg import Goal
+# from dynus_interfaces.msg import Goal
+from snapstack_msgs2.msg import Goal as GoalSnap
+from snapstack_msgs2.msg import State as StateSnap
 from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
 from std_msgs.msg import Header
 from mavros import mavlink
@@ -142,9 +144,15 @@ class BasicMavrosInterface(Node):
             "mavros/mission/waypoints", self.mission_wp_callback, qos_profile
         )
         
-        # Dynus subscriptions
-        self.traj_topic = '/NX01/goal'
-        self.dynus_traj_sub = self.create_subscription(Goal, self.traj_topic, self.repub_traj_cb, qos_profile)
+        # Dynus subscriptions/publishers 
+        # self.traj_topic = '/NX01/goal'
+        # self.dynus_traj_sub = self.create_subscription(Goal, self.traj_topic, self.repub_traj_cb, qos_profile)
+
+        # Traj Gen subscriptions/publishers 
+        self.traj_topic = '/SQ01/goal'
+        self.state_topic = '/SQ01/state'
+        self.dynus_traj_sub = self.create_subscription(GoalSnap, self.traj_topic, self.repub_traj_cb, qos_profile)
+        self.dynus_state_pub = self.create_publisher(StateSnap, self.state_topic, qos_profile)
 
         # ROS publishers
         # self.mavlink_pub = self.create_publisher(Mavlink, "mavlink/to", 1)
@@ -187,6 +195,27 @@ class BasicMavrosInterface(Node):
     #
     def repub_traj_cb(self, msg):
         self.received_trajectory_setpoint = msg
+
+        traj_gen_state = StateSnap(
+            header=Header(
+                stamp=self.get_clock().now().to_msg(),
+                frame_id="map"
+            ),
+            pos=Point(
+                x=self.local_position.pose.position.x,
+                y=self.local_position.pose.position.y,
+                z=self.local_position.pose.position.z
+            ),
+            quat=Quaternion(
+                x=self.local_position.pose.orientation.x,
+                y=self.local_position.pose.orientation.y,
+                z=self.local_position.pose.orientation.z,
+                w=self.local_position.pose.orientation.w
+            )
+        )
+
+        self.dynus_state_pub.publish(traj_gen_state)
+
 
 
     def altitude_callback(self, data):

@@ -36,6 +36,7 @@ setup(
             'track_dynus_traj = ros2_px4_stack.track_dynus_traj:main',
             'fix_livox_pose = ros2_px4_stack.fix_livox_pose:main',
             'bag_to_csv = ros2_px4_stack.bag_to_csv:main',
+            'track_gen_traj = ros2_px4_stack.track_gen_traj:main'
         ],
     },
 )

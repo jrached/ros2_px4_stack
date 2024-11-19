@@ -13,8 +13,11 @@ from rclpy.node import Node
 import math
 from threading import Thread
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, Transform, Twist, Vector3
-from dynus_interfaces.msg import Goal
+# from dynus_interfaces.msg import Goal
 from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
+
+from snapstack_msgs2.msg import Goal as GoalSnap 
+from snapstack_msgs2.msg import State as StateSnap
 
 from std_msgs.msg import Header
 from mavros import mavlink
@@ -299,7 +302,81 @@ class OffboardPathFollower(BasicMavrosInterface):
         return setpoints
 
 
-    def _pack_into_traj(self, point: Goal):
+    # def _pack_into_traj(self, point: Goal):
+    #     assert self.navigation_mode == LOCAL_NAVIGATION, (
+    #         f"Invalid navigation mode: {self.navigation_mode}."
+    #         f"Only local navigation is supported for this method"
+    #     )
+
+    #     trajectory_points = [MultiDOFJointTrajectoryPoint(
+    #         transforms=[Transform(
+    #             translation=Vector3(
+    #                 x=point.p.x,
+    #                 y=point.p.y,
+    #                 z=point.p.z,
+    #             ),
+    #             rotation=Quaternion(
+    #                 x=self.yaw_to_quaternion(point.yaw)[0],
+    #                 y=self.yaw_to_quaternion(point.yaw)[1],
+    #                 z=self.yaw_to_quaternion(point.yaw)[2],
+    #                 w=self.yaw_to_quaternion(point.yaw)[3]
+    #             )
+    #         )],
+    #         velocities=[Twist(
+    #             linear=Vector3(
+    #                 x=point.v.x,
+    #                 y=point.v.y,
+    #                 z=point.v.z
+    #             ),
+    #             angular=Vector3(
+    #                 x=0.0,
+    #                 y=0.0,
+    #                 z=point.dyaw
+    #             )
+    #         )],
+    #         accelerations=[Twist(
+    #             linear=Vector3(
+    #                 x=point.a.x,
+    #                 y=point.a.y,
+    #                 z=point.a.z
+    #             )
+    #         )]
+
+    #     )]
+
+    #     trajectory_msg = MultiDOFJointTrajectory(
+    #         header=Header(
+    #             stamp=self.get_clock().now().to_msg(),
+    #             frame_id="map"
+    #         ),
+    #         points=trajectory_points
+    #     )
+
+    #     return trajectory_msg
+
+
+    def yaw_to_quaternion(self, yaw):
+        qx = 0.0
+        qy = 0.0
+        qz = math.sin(yaw / 2.0)
+        qw = math.cos(yaw / 2.0)
+
+        return [qx, qy, qz, qw]
+
+
+    #############################
+    ### Temp Traj Gen Changes ###
+    #############################
+    #TODO: Cleanly integrate into code
+
+    def track_trajectory(self):
+        # wait 1 second for FCU connection
+        self.wait_for_seconds(1)
+        while rclpy.ok():
+            self.trajectory_setpoint = self._pack_into_traj_gen(self.received_trajectory_setpoint)
+            self.wait_for_seconds(0.2)
+
+    def _pack_into_traj_gen(self, point: GoalSnap):
         assert self.navigation_mode == LOCAL_NAVIGATION, (
             f"Invalid navigation mode: {self.navigation_mode}."
             f"Only local navigation is supported for this method"
@@ -313,10 +390,10 @@ class OffboardPathFollower(BasicMavrosInterface):
                     z=point.p.z,
                 ),
                 rotation=Quaternion(
-                    x=self.yaw_to_quaternion(point.yaw)[0],
-                    y=self.yaw_to_quaternion(point.yaw)[1],
-                    z=self.yaw_to_quaternion(point.yaw)[2],
-                    w=self.yaw_to_quaternion(point.yaw)[3]
+                    x=self.yaw_to_quaternion(point.psi)[0],
+                    y=self.yaw_to_quaternion(point.psi)[1],
+                    z=self.yaw_to_quaternion(point.psi)[2],
+                    w=self.yaw_to_quaternion(point.psi)[3]
                 )
             )],
             velocities=[Twist(
@@ -328,7 +405,7 @@ class OffboardPathFollower(BasicMavrosInterface):
                 angular=Vector3(
                     x=0.0,
                     y=0.0,
-                    z=point.dyaw
+                    z=point.dpsi
                 )
             )],
             accelerations=[Twist(
@@ -350,15 +427,6 @@ class OffboardPathFollower(BasicMavrosInterface):
         )
 
         return trajectory_msg
-
-    def yaw_to_quaternion(self, yaw):
-        qx = 0.0
-        qy = 0.0
-        qz = math.sin(yaw / 2.0)
-        qw = math.cos(yaw / 2.0)
-
-        return [qx, qy, qz, qw]
-
 
 def main():
     rclpy.init()
