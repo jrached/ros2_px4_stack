@@ -12,7 +12,7 @@ Juan Notes:
 import rclpy
 from rclpy.node import Node
 from rclpy.node import Node
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, TwistStamped
 import threading
 from threading import Thread
 # from threading import Thread
@@ -31,17 +31,27 @@ class MocapRepublisher(Node):
             # "~mocap_sub_topic_name", "/optitrack" + NAMESPACE + "world"
             "~mocap_sub_topic_name", NAMESPACE + "world"
         ).value
+
+        self.mocap_vel_sub_topic_name = NAMESPACE + "mocap/twist"
+
         self.mocap_pub_topic_name = self.declare_parameter(
             "~mocap_pub_topic_name",  "/mavros/vision_pose/pose"
         ).value
+
+        self.mocap_vel_pub_topic_name = "/mavros/vision_speed/speed_twist"
 
         self._mocap_sub = self.create_subscription(PoseStamped,
             self.mocap_sub_topic_name, self._mocap_cb, 10)
         self._last_msg = None
 
+        self._mocap_vel_sub = self.create_subscription(TwistStamped,
+            self.mocap_vel_sub_topic_name, self._mocap_vel_cb, 10)
+        self._last_vel_msg = None
+
         # Publish at the specified rate in a separate thread
         self._pub_hz = pub_hz
         self._mocap_pub = self.create_publisher(PoseStamped, self.mocap_pub_topic_name, 10)
+        self._mocap_vel_pub = self.create_publisher(TwistStamped, self.mocap_vel_pub_topic_name, 10)
         self._pub_thread = Thread(target=self._publish_loop, args=())
         self._pub_thread.daemon = True
         self._pub_thread.start()
@@ -50,11 +60,16 @@ class MocapRepublisher(Node):
     def _mocap_cb(self, msg):
         self._last_msg = msg
 
+    def _mocap_vel_cb(self, msg):
+        self._last_vel_msg = msg
+
     def _publish_loop(self):
         rate = self.create_rate(self._pub_hz)
         while rclpy.ok():
             if self._last_msg:
                 self._mocap_pub.publish(self._last_msg)
+            if self._last_vel_msg:
+                self._mocap_vel_pub.publish(self._last_vel_msg)
             rate.sleep()
 
 def main():
