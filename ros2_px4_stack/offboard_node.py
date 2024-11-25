@@ -373,8 +373,9 @@ class OffboardPathFollower(BasicMavrosInterface):
         # wait 1 second for FCU connection
         self.wait_for_seconds(1)
         while rclpy.ok():
-            self.trajectory_setpoint = self._pack_into_traj_gen(self.received_trajectory_setpoint)
-            self.wait_for_seconds(0.2)
+            if self.received_trajectory_setpoint != None:
+                self.trajectory_setpoint = self._pack_into_traj_gen(self.received_trajectory_setpoint)
+                self.wait_for_seconds(0.2)
 
     def _pack_into_traj_gen(self, point: GoalSnap):
         assert self.navigation_mode == LOCAL_NAVIGATION, (
