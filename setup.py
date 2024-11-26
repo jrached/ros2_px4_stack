@@ -1,4 +1,5 @@
 from setuptools import find_packages, setup
+from glob import glob 
 
 package_name = 'ros2_px4_stack'
 
@@ -10,10 +11,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name + '/launch', ['launch/mocap_offboard.launch.py']),
-        ('share/' + package_name + '/launch', ['launch/offboard_square_example.launch.py']),
-        ('share/' + package_name + '/launch', ['launch/dynus_mavros.launch.py']),
-
+        ('share/' + package_name + '/launch', glob('launch/*.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
