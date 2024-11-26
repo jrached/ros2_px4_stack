@@ -4,32 +4,40 @@ import subprocess
 
 def run_tmux_commands(session_name, commands):
     """
-    Set up a TMUX session with multiple windows and run specific commands in each.
-    
+    Set up a TMUX session with a 2x2 grid of panes, each running a specific command.
+
     Args:
         session_name (str): Name of the TMUX session.
-        commands (list): A list of commands to execute in each window.
+        commands (list): A list of commands to execute in each pane (up to 4).
     """
     try:
         # Start a new TMUX session
         subprocess.run(["tmux", "new-session", "-d", "-s", session_name], check=True)
-        
+
+        # Split the terminal into a 2x2 grid
+        subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0"], check=True)  # Split horizontally
+        subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.0"], check=True)  # Split top vertically
+        subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.1"], check=True)  # Split bottom vertically
+        subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0.2"], check=True) # Split bottom-left horizontally
+        subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0.3"], check=True) # Split bottom-right horizontally
+        subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0.4"], check=True) # Split bottom-left horizontally
+        subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.5"], check=True) # Split bottom-right vertically
+        subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.0"], check=True) # Split bottom-right vertically
+
+        # Commands to run in each pane
         for i, cmd in enumerate(commands):
-            if i == 0:
-                # For the first window (created automatically), just rename it
-                subprocess.run(["tmux", "rename-window", "-t", f"{session_name}:0", f"window_{i+1}"], check=True)
-            else:
-                # Create new windows for the subsequent commands
-                subprocess.run(["tmux", "new-window", "-t", session_name, "-n", f"window_{i+1}"], check=True)
-            
-            # Send the commands to the window
-            command_sequence = f"cd ~/mavros_ws && source install/setup.bash && {cmd}"
-            subprocess.run(["tmux", "send-keys", "-t", f"{session_name}:window_{i+1}", command_sequence, "C-m"], check=True)
-        
+            # Construct the full command with setup steps
+            full_command = f"cd ~/mavros_ws && source install/setup.bash && {cmd}"
+            # Send the command to the corresponding pane
+            subprocess.run(["tmux", "send-keys", "-t", f"{session_name}:0.{i}", full_command, "C-m"], check=True)
+
+        # Select the first pane and arrange in an even grid
+        subprocess.run(["tmux", "select-layout", "-t", session_name, "tiled"], check=True)
+
         # Attach to the session
-        print(f"TMUX session '{session_name}' created. Attaching...")
+        print(f"TMUX session '{session_name}' created with a 3x3 grid. Attaching...")
         subprocess.run(["tmux", "attach-session", "-t", session_name])
-    
+
     except subprocess.CalledProcessError as e:
         print(f"Error setting up TMUX session: {e}")
 
@@ -37,9 +45,15 @@ if __name__ == "__main__":
     # Define the session name and commands
     session_name = "px01_tmux_session"
     commands = [
-        "ros2 launch mavros px4.launch",  # Command for window 1
-        "ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for window 2
-        "ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for window 3
-        "ros2 launch ros2_px4_stack offboard_gen_traj.launch.py",  # Command for window 4
+        "ros2 launch mavros px4.launch",  # Command for pane 1
+        "ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for pane 2
+        "ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
+        "ros2 launch ros2_px4_stack offboard_gen_traj.launch.py",  # Command for pane 4,
+        "ros2 launch plotting repub_all.launch.py", # Pane 5
+        "sleep 5.0 && cd bags && cd test && ros2 bag record /repub_des_pos /repub_mes_pos /repub_mes_vel", # Pane 6
+        "ros2 topic echo /mavros/local_position/pose", # Pane 7
+        "ros2 topic echo /PX01/world", # Pane  8
+        "ros2 topic echo /SQ01/goal", # Pane 9
     ]
     run_tmux_commands(session_name, commands)
+
