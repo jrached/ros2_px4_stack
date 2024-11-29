@@ -89,7 +89,7 @@ def main():
         node_name=node_name, navigation_mode=LOCAL_NAVIGATION
     )
 
-    path_follower.track_square(side_length=2.5, altitude=2.5)
+    path_follower.track_square(side_length=2.5, altitude=1.8)
 
 if __name__ == "__main__":
     main()
