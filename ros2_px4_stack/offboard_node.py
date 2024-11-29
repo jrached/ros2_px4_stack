@@ -118,11 +118,16 @@ class OffboardPathFollower(BasicMavrosInterface):
         # wait 1 second for FCU connection
         self.wait_for_seconds(1)
 
-        flight_state, completed_laps, max_laps = 0, 0, 2
+        flight_state, completed_laps, max_laps = -1, 0, 2
         while rclpy.ok():
-            if flight_state == 0: 
+
+            if flight_state == -1:
+                x_init, y_init = self.local_position.pose.position.x, self.local_position.pose.position.y
+                flight_state = 0
+
+            elif flight_state == 0: 
                 #Creates takeoff setpoint
-                takeoff_vertices = [(self.local_position.pose.position.x, self.local_position.pose.position.y, altitude)]
+                takeoff_vertices = [(x_init, y_init, altitude)]
                 takeoff_setpoints = self._pack_into_setpoints(takeoff_vertices)
                
                 #Sets current setpoint to takeoff (this gets published in publish_current_setpoint())
