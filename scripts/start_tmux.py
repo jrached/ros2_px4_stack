@@ -50,7 +50,7 @@ if __name__ == "__main__":
         "ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
         "ros2 launch ros2_px4_stack offboard_gen_traj.launch.py",  # Command for pane 4,
         "ros2 launch plotting repub_all.launch.py", # Pane 5
-        "sleep 20.0 && cd bags && cd test && rm -rf rosbag* && ros2 bag record /repub_des_pos /repub_mes_pos /repub_mes_vel /repub_des_att", # Pane 6
+        "sleep 30.0 && cd bags && cd test && rm -rf rosbag* && ros2 bag record /repub_des_pos /repub_mes_pos /repub_mes_vel /repub_des_att", # Pane 6
         "ros2 topic echo /mavros/local_position/pose", # Pane 7
         "ros2 topic echo /PX01/world", # Pane  8
         "ros2 topic echo /SQ01/goal", # Pane 9
