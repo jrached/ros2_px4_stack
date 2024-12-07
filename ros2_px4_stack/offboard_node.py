@@ -13,7 +13,8 @@ from rclpy.node import Node
 import math
 from threading import Thread
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, Transform, Twist, Vector3
-# from dynus_interfaces.msg import Goal
+from dynus_interfaces.msg import Goal
+from dynus_interfaces.msg import State as StateDynus
 from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
 
 from snapstack_msgs2.msg import Goal as GoalSnap 
@@ -88,6 +89,13 @@ class OffboardPathFollower(BasicMavrosInterface):
         )
         self.trajectory_publish_thread.daemon = True
         self.trajectory_publish_thread.start() 
+
+        # Start thread for dynus state publisher 
+        # self.dynus_state_thread = Thread(
+        #     target=self._publish_dynus_state, args=([self.local_position])
+        # )
+        # self.dynus_state_thread.daemon = True
+        # self.dynus_state_thread.start() 
 
         # set up capacity to listen for custom setpoints
         self.outside_setpoint_sub = self.create_subscription(PoseStamped,
@@ -167,39 +175,42 @@ class OffboardPathFollower(BasicMavrosInterface):
         self.wait_for_seconds(1)
 
         flight_state = "TAKEOFF"
-        x_init, y_init = self.local_position.pose.position.x, self.local_position.pose.position.y
+        takeoff_pos = self.point_to_traj([self.local_position.pose.position.x, self.local_position.pose.position.y, altitude])
+        init_pos = self.point_to_traj([0.0, 0.0, altitude])
+
         while rclpy.ok():
             if flight_state == "TAKEOFF":
-                takeoff_point = MultiDOFJointTrajectoryPoint()
-                
-                transform = Transform()
-                transform.translation.x = x_init
-                transform.translation.y = y_init 
-                transform.translation.z = altitude
-                takeoff_point.transforms = [transform]
-                
-                twist = Twist()
-                takeoff_point.velocities = [twist]
+                self.get_logger().info("Taking Off")
 
-                takeoff_traj = MultiDOFJointTrajectory()
-                takeoff_traj.points = [takeoff_point]
+                self.trajectory_setpoint = takeoff_pos
 
-                self.trajectory_setpoint = takeoff_traj
+                if (self.traj_point_reached(takeoff_pos)):
+                    self.get_logger().info("Takeoff Complete")
+                    flight_state = "INITPOS"
 
-                if (self.traj_point_reached(takeoff_traj)
+            elif flight_state == "INITPOS":
+                self.get_logger().info("Going To Initial Position")
+
+                self.trajectory_setpoint = init_pos
+
+                if (self.traj_point_reached(init_pos)
                     and self.received_trajectory_setpoint is not None
                 ):
+                    self.get_logger().info("Reached Initial Position")
                     flight_state = "TRAJECTORY"
 
             elif flight_state == "TRAJECTORY":
-                self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
+                self.get_logger().info("Following Trajectory")
+                if self.received_trajectory_setpoint:
+                    self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
 
                 # If trajectory is over 
-                if (self.count_publishers(self.traj_topic) == 0):
+                if (self.count_publishers(self.dynus_goal_topic) == 0):
+                    self.get_logger().info("Returning to Initial Position")
                     flight_state = "RETURN"
             
             elif flight_state == "RETURN":
-                self.trajectory_setpoint = takeoff_traj
+                self.trajectory_setpoint = init_pos
 
             self.wait_for_seconds(0.2)
 
@@ -208,6 +219,33 @@ class OffboardPathFollower(BasicMavrosInterface):
         start_time = self.get_clock().now()
         while (self.get_clock().now() - start_time).nanoseconds < seconds * 1e9:
             rclpy.spin_once(self)
+
+    # def _publish_dynus_state(self, local_position):
+    #     dynus_state = StateDynus(
+    #         header=Header(
+    #             stamp=self.get_clock().now().to_msg(),
+    #             frame_id="map"
+    #         ),
+    #         pos=Vector3(
+    #             x=local_position.pose.position.x,
+    #             y=local_position.pose.position.y,
+    #             z=local_position.pose.position.z
+    #         ),
+    #         quat=Quaternion(
+    #             x=local_position.pose.orientation.x,
+    #             y=local_position.pose.orientation.y,
+    #             z=local_position.pose.orientation.z,
+    #             w=local_position.pose.orientation.w
+    #         )
+    #     )
+
+    #     publish_rate = 10 #Hz
+    #     rate = self.create_rate(publish_rate)
+    #     while rclpy.ok():
+    #         if dynus_state is not None:
+    #             self.dynus_state_pub.publish(dynus_state)
+    #         rate.sleep()
+
 
     def _publish_current_setpoint(self):
         """Publishes the current setpoint"""
@@ -220,10 +258,6 @@ class OffboardPathFollower(BasicMavrosInterface):
             ):
                 self.setpoint_position_pub.publish(self.current_setpoint)
             rate.sleep()
-
-    # def update_trajectory(self, point):
-    #     self.received_trajectory_setpoint = point #Change back!
-    #     self.get_logger().info(f"received traj: {self.received_trajectory_setpoint}")
 
     def _publish_trajectory_setpoint(self):
         rate = 50 #Hz
@@ -307,57 +341,79 @@ class OffboardPathFollower(BasicMavrosInterface):
         return setpoints
 
 
-    # def _pack_into_traj(self, point: Goal):
-    #     assert self.navigation_mode == LOCAL_NAVIGATION, (
-    #         f"Invalid navigation mode: {self.navigation_mode}."
-    #         f"Only local navigation is supported for this method"
-    #     )
+    def point_to_traj(self, point: List):
+        """
+        Converts a single point into a mavros trajectory object.
+        """
+        traj_point = MultiDOFJointTrajectoryPoint()
+            
+        transform = Transform()
+        transform.translation.x = point[0]
+        transform.translation.y = point[1]
+        transform.translation.z = point[2]
+        traj_point.transforms = [transform]
+        
+        twist = Twist()
+        traj_point.velocities = [twist]
+        traj = MultiDOFJointTrajectory()
+        traj.points = [traj_point]
 
-    #     trajectory_points = [MultiDOFJointTrajectoryPoint(
-    #         transforms=[Transform(
-    #             translation=Vector3(
-    #                 x=point.p.x,
-    #                 y=point.p.y,
-    #                 z=point.p.z,
-    #             ),
-    #             rotation=Quaternion(
-    #                 x=self.yaw_to_quaternion(point.yaw)[0],
-    #                 y=self.yaw_to_quaternion(point.yaw)[1],
-    #                 z=self.yaw_to_quaternion(point.yaw)[2],
-    #                 w=self.yaw_to_quaternion(point.yaw)[3]
-    #             )
-    #         )],
-    #         velocities=[Twist(
-    #             linear=Vector3(
-    #                 x=point.v.x,
-    #                 y=point.v.y,
-    #                 z=point.v.z
-    #             ),
-    #             angular=Vector3(
-    #                 x=0.0,
-    #                 y=0.0,
-    #                 z=point.dyaw
-    #             )
-    #         )],
-    #         accelerations=[Twist(
-    #             linear=Vector3(
-    #                 x=point.a.x,
-    #                 y=point.a.y,
-    #                 z=point.a.z
-    #             )
-    #         )]
+        return traj
 
-    #     )]
+    def _pack_into_traj(self, point: Goal):
+        """
+        Converts a dynus trajectory into a mavros trajectory point by point. 
+        """
+        assert self.navigation_mode == LOCAL_NAVIGATION, (
+            f"Invalid navigation mode: {self.navigation_mode}."
+            f"Only local navigation is supported for this method"
+        )
 
-    #     trajectory_msg = MultiDOFJointTrajectory(
-    #         header=Header(
-    #             stamp=self.get_clock().now().to_msg(),
-    #             frame_id="map"
-    #         ),
-    #         points=trajectory_points
-    #     )
+        trajectory_points = [MultiDOFJointTrajectoryPoint(
+            transforms=[Transform(
+                translation=Vector3(
+                    x=point.p.x,
+                    y=point.p.y,
+                    z=point.p.z,
+                ),
+                rotation=Quaternion(
+                    x=self.yaw_to_quaternion(point.yaw)[0],
+                    y=self.yaw_to_quaternion(point.yaw)[1],
+                    z=self.yaw_to_quaternion(point.yaw)[2],
+                    w=self.yaw_to_quaternion(point.yaw)[3]
+                )
+            )],
+            velocities=[Twist(
+                linear=Vector3(
+                    x=point.v.x,
+                    y=point.v.y,
+                    z=point.v.z
+                ),
+                angular=Vector3(
+                    x=0.0,
+                    y=0.0,
+                    z=point.dyaw
+                )
+            )],
+            accelerations=[Twist(
+                linear=Vector3(
+                    x=point.a.x,
+                    y=point.a.y,
+                    z=point.a.z
+                )
+            )]
 
-    #     return trajectory_msg
+        )]
+
+        trajectory_msg = MultiDOFJointTrajectory(
+            header=Header(
+                stamp=self.get_clock().now().to_msg(),
+                frame_id="map"
+            ),
+            points=trajectory_points
+        )
+
+        return trajectory_msg
 
 
     def yaw_to_quaternion(self, yaw):

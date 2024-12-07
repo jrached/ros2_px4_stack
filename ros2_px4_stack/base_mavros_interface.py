@@ -6,8 +6,9 @@ from rclpy.node import Node
 from rclpy.executors import ExternalShutdownException
 import math
 from threading import Thread
-from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
-# from dynus_interfaces.msg import Goal
+from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, Vector3
+from dynus_interfaces.msg import Goal
+from dynus_interfaces.msg import State as StateDynus
 from snapstack_msgs2.msg import Goal as GoalSnap
 from snapstack_msgs2.msg import State as StateSnap
 from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
@@ -145,20 +146,18 @@ class BasicMavrosInterface(Node):
         )
         
         # Dynus subscriptions/publishers 
-        # self.traj_topic = '/NX01/goal'
-        # self.dynus_traj_sub = self.create_subscription(Goal, self.traj_topic, self.repub_traj_cb, qos_profile)
+        self.dynus_goal_topic = '/NX01/goal'
+        self.dynus_state_topic = '/NX01/state'
+        self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, qos_profile)
+        self.dynus_state_pub = self.create_publisher(StateDynus, self.dynus_state_topic, 1)
 
         # Traj Gen subscriptions/publishers 
-        self.traj_topic = '/SQ01/goal'
-        self.state_topic = '/SQ01/state'
-        self.dynus_traj_sub = self.create_subscription(GoalSnap, self.traj_topic, self.repub_traj_cb, qos_profile)
-        self.dynus_state_pub = self.create_publisher(StateSnap, self.state_topic, qos_profile)
+        self.trajgen_goal_topic =  '/SQ01/goal'
+        self.trajgen_state_topic = '/SQ01/state'
+        self.trajgen_goal_sub = self.create_subscription(GoalSnap, self.trajgen_goal_topic, self.repub_traj_cb, qos_profile)
+        self.trajgen_state_pub = self.create_publisher(StateSnap, self.trajgen_state_topic, 1)
 
         # ROS publishers
-        # self.mavlink_pub = self.create_publisher(Mavlink, "mavlink/to", 1)
-        # self.setpoint_position_pub = self.create_publisher(PoseStamped,
-        #     "mavros/setpoint_position/local", 1
-        # )
         self.mavlink_pub = self.create_publisher(Mavlink, "mavlink/to", qos_profile)
         self.setpoint_position_pub = self.create_publisher(PoseStamped,
             "mavros/setpoint_position/local", 
@@ -196,7 +195,7 @@ class BasicMavrosInterface(Node):
     def repub_traj_cb(self, msg):
         self.received_trajectory_setpoint = msg
 
-        traj_gen_state = StateSnap(
+        trajgen_state = StateSnap(
             header=Header(
                 stamp=self.get_clock().now().to_msg(),
                 frame_id="map"
@@ -214,8 +213,11 @@ class BasicMavrosInterface(Node):
             )
         )
 
-        self.dynus_state_pub.publish(traj_gen_state)
+        self.trajgen_state_pub.publish(trajgen_state)
 
+
+    def dynus_cb(self, msg):
+        self.received_trajectory_setpoint = msg
 
 
     def altitude_callback(self, data):
@@ -274,6 +276,28 @@ class BasicMavrosInterface(Node):
 
         if not self.sub_topics_ready["local_pos"]:
             self.sub_topics_ready["local_pos"] = True
+
+        #TODO: Find another place for this
+        dynus_state = StateDynus(
+            header=Header(
+                stamp=self.get_clock().now().to_msg(),
+                frame_id="map"
+            ),
+            pos=Vector3(
+                x=self.local_position.pose.position.x,
+                y=self.local_position.pose.position.y,
+                z=self.local_position.pose.position.z
+            ),
+            quat=Quaternion(
+                x=self.local_position.pose.orientation.x,
+                y=self.local_position.pose.orientation.y,
+                z=self.local_position.pose.orientation.z,
+                w=self.local_position.pose.orientation.w
+            )
+        )
+
+        self.dynus_state_pub.publish(dynus_state)
+
 
     def mission_wp_callback(self, data):
         if self.mission_wp.current_seq != data.current_seq:

@@ -62,7 +62,7 @@ class SmoothTrajectoryTracker(OffboardPathFollower):
 def main(args=None):
     rclpy.init(args=args)
     traj_tracker = SmoothTrajectoryTracker()
-    traj_tracker.track_trajectory(altitude = 1.8)
+    traj_tracker.track_trajectory(altitude = 2.5)
 
 if __name__ == '__main__':
     main()
