@@ -73,7 +73,6 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
         qos_profile.durability = DurabilityPolicy.VOLATILE
         qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
 
-
         # Traj gen sub/pub
         self.trajgen_goal_topic =  '/SQ01/goal'
         self.trajgen_state_topic = '/SQ01/state'
@@ -97,7 +96,7 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
             rclpy.spin_once(self)
 
     def _publish_trajectory_setpoint(self):
-        rate = 50 #Hz
+        rate = 100 #Hz
         rate = self.create_rate(rate)
         while rclpy.ok():
             if (
