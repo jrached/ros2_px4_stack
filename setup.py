@@ -1,4 +1,5 @@
 from setuptools import find_packages, setup
+from glob import glob 
 
 package_name = 'ros2_px4_stack'
 
@@ -10,10 +11,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name + '/launch', ['launch/mocap_offboard.launch.py']),
-        ('share/' + package_name + '/launch', ['launch/offboard_square_example.launch.py']),
-        ('share/' + package_name + '/launch', ['launch/dynus_mavros.launch.py']),
-
+        ('share/' + package_name + '/launch', glob('launch/*.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -26,16 +24,16 @@ setup(
         'console_scripts': [
             'base_mavros_interface = ros2_px4_stack.base_mavros_interface:main',
             'drone_vars = ros2_px4_stack.drone_vars:main', 
-            'make_experiment_trajectories = ros2_px4_stack.make_experiment_trajectories:main',
             'my_transform_broadcaster = ros2_px4_stack.my_transform_broadcaster:main',
             'offboard_node = ros2_px4_stack.offboard_node:main',
-            'publish_trajectories = ros2_px4_stack.publish_trajectories:main',
             'repub_mocap = ros2_px4_stack.repub_mocap:main',
-            'spoofed_mocap = ros2_px4_stack.spoofed_mocap:main',
             'track_square_node = ros2_px4_stack.track_square_node:main',
             'track_dynus_traj = ros2_px4_stack.track_dynus_traj:main',
             'fix_livox_pose = ros2_px4_stack.fix_livox_pose:main',
-            'bag_to_csv = ros2_px4_stack.bag_to_csv:main',
+            'track_gen_traj = ros2_px4_stack.track_gen_traj:main',
+            'setpoint_offboard_node = ros2_px4_stack.setpoint_offboard_node:main',
+            'trajgen_offboard_node = ros2_px4_stack.trajgen_offboard_node:main',
+            'dynus_offboard_node = ros2_px4_stack.dynus_offboard_node:main'
         ],
     },
 )

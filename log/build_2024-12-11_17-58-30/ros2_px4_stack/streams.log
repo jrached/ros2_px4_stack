@@ -1,0 +1,86 @@
+[0.485s] Invoking command in '/home/juan/mavros_ws/src/ros2_px4_stack': PYTHONPATH=/home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base build/ros2_px4_stack build --build-base /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build install --record /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/install.log --single-version-externally-managed install_data
+[0.686s] running egg_info
+[0.686s] creating build/ros2_px4_stack/ros2_px4_stack.egg-info
+[0.686s] writing build/ros2_px4_stack/ros2_px4_stack.egg-info/PKG-INFO
+[0.687s] writing dependency_links to build/ros2_px4_stack/ros2_px4_stack.egg-info/dependency_links.txt
+[0.687s] writing entry points to build/ros2_px4_stack/ros2_px4_stack.egg-info/entry_points.txt
+[0.687s] writing requirements to build/ros2_px4_stack/ros2_px4_stack.egg-info/requires.txt
+[0.687s] writing top-level names to build/ros2_px4_stack/ros2_px4_stack.egg-info/top_level.txt
+[0.687s] writing manifest file 'build/ros2_px4_stack/ros2_px4_stack.egg-info/SOURCES.txt'
+[0.688s] reading manifest file 'build/ros2_px4_stack/ros2_px4_stack.egg-info/SOURCES.txt'
+[0.689s] writing manifest file 'build/ros2_px4_stack/ros2_px4_stack.egg-info/SOURCES.txt'
+[0.689s] running build
+[0.689s] running build_py
+[0.689s] creating /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build
+[0.689s] creating /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib
+[0.689s] creating /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.689s] copying ros2_px4_stack/track_dynus_traj.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.689s] copying ros2_px4_stack/offboard_node.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.689s] copying ros2_px4_stack/track_gen_traj.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.689s] copying ros2_px4_stack/dynus_offboard_node.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.689s] copying ros2_px4_stack/my_transform_broadcaster.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.689s] copying ros2_px4_stack/__init__.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.689s] copying ros2_px4_stack/fix_livox_pose.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.689s] copying ros2_px4_stack/setpoint_offboard_node.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.690s] copying ros2_px4_stack/trajgen_offboard_node.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.690s] copying ros2_px4_stack/drone_vars.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.690s] copying ros2_px4_stack/base_mavros_interface.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.690s] copying ros2_px4_stack/repub_mocap.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.690s] copying ros2_px4_stack/track_square_node.py -> /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack
+[0.690s] running install
+[0.690s] running install_lib
+[0.691s] creating /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.691s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/track_dynus_traj.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.691s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/offboard_node.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.691s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/track_gen_traj.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.691s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/dynus_offboard_node.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.691s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/my_transform_broadcaster.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.691s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/__init__.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.691s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/fix_livox_pose.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.691s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/setpoint_offboard_node.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.691s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/trajgen_offboard_node.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.691s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/drone_vars.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.691s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/base_mavros_interface.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.692s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/repub_mocap.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.692s] copying /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build/lib/ros2_px4_stack/track_square_node.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack
+[0.692s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/track_dynus_traj.py to track_dynus_traj.cpython-310.pyc
+[0.692s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/offboard_node.py to offboard_node.cpython-310.pyc
+[0.694s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/track_gen_traj.py to track_gen_traj.cpython-310.pyc
+[0.694s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/dynus_offboard_node.py to dynus_offboard_node.cpython-310.pyc
+[0.695s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/my_transform_broadcaster.py to my_transform_broadcaster.cpython-310.pyc
+[0.696s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/__init__.py to __init__.cpython-310.pyc
+[0.696s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/fix_livox_pose.py to fix_livox_pose.cpython-310.pyc
+[0.696s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/setpoint_offboard_node.py to setpoint_offboard_node.cpython-310.pyc
+[0.697s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/trajgen_offboard_node.py to trajgen_offboard_node.cpython-310.pyc
+[0.698s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/drone_vars.py to drone_vars.cpython-310.pyc
+[0.698s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/base_mavros_interface.py to base_mavros_interface.cpython-310.pyc
+[0.700s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/repub_mocap.py to repub_mocap.cpython-310.pyc
+[0.700s] byte-compiling /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack/track_square_node.py to track_square_node.cpython-310.pyc
+[0.701s] running install_data
+[0.701s] creating /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/share/ament_index
+[0.701s] creating /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/share/ament_index/resource_index
+[0.701s] creating /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/share/ament_index/resource_index/packages
+[0.701s] copying resource/ros2_px4_stack -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/share/ament_index/resource_index/packages
+[0.701s] copying package.xml -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/share/ros2_px4_stack
+[0.701s] creating /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/share/ros2_px4_stack/launch
+[0.701s] copying launch/mocap_offboard.launch.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/share/ros2_px4_stack/launch
+[0.701s] copying launch/offboard_square_example.launch.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/share/ros2_px4_stack/launch
+[0.701s] copying launch/dynus_mavros.launch.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/share/ros2_px4_stack/launch
+[0.702s] copying launch/offboard_gen_traj.launch.py -> /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/share/ros2_px4_stack/launch
+[0.702s] running install_egg_info
+[0.703s] Copying build/ros2_px4_stack/ros2_px4_stack.egg-info to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages/ros2_px4_stack-0.0.0-py3.10.egg-info
+[0.704s] running install_scripts
+[0.719s] Installing base_mavros_interface script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.719s] Installing drone_vars script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.719s] Installing dynus_offboard_node script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.719s] Installing fix_livox_pose script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.719s] Installing my_transform_broadcaster script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.719s] Installing offboard_node script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.719s] Installing repub_mocap script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.719s] Installing setpoint_offboard_node script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.720s] Installing track_dynus_traj script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.720s] Installing track_gen_traj script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.720s] Installing track_square_node script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.720s] Installing trajgen_offboard_node script to /home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/ros2_px4_stack
+[0.720s] writing list of installed files to '/home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/install.log'
+[0.735s] Invoked command in '/home/juan/mavros_ws/src/ros2_px4_stack' returned '0': PYTHONPATH=/home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/juan/mavros_ws/src/ros2_px4_stack/install/ros2_px4_stack/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base build/ros2_px4_stack build --build-base /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/build install --record /home/juan/mavros_ws/src/ros2_px4_stack/build/ros2_px4_stack/install.log --single-version-externally-managed install_data
