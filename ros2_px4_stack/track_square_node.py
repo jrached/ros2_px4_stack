@@ -43,7 +43,7 @@ NAVIGATION_MODES = [LOCAL_NAVIGATION, GLOBAL_NAVIGATION]
 from .offboard_node import OffboardPathFollower
 
 
-class SquarePathFollower(OffboardPathFollower):
+class SquarePathFollower(OffboardSetpointFollower):
 
     def __init__(
         self,

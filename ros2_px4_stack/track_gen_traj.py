@@ -46,7 +46,7 @@ NAVIGATION_MODES = [LOCAL_NAVIGATION, GLOBAL_NAVIGATION]
 
 from .offboard_node import OffboardPathFollower
 
-class SmoothTrajectoryTracker(OffboardPathFollower):
+class SmoothTrajectoryTracker(OffboardTrajgenFollower):
 
     def __init__(self, 
         node_name: str="smooth_trajectory_tracker", 
