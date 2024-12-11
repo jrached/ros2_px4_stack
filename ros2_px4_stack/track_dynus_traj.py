@@ -41,7 +41,7 @@ LOCAL_NAVIGATION = 0
 GLOBAL_NAVIGATION = 1
 NAVIGATION_MODES = [LOCAL_NAVIGATION, GLOBAL_NAVIGATION]
 
-from .offboard_node import OffboardPathFollower
+from .dynus_offboard_node import OffboarDynusFollower
 
 class SmoothTrajectoryTracker(OffboardDynusFollower):
 

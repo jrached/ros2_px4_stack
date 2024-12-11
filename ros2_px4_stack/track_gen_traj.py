@@ -44,7 +44,7 @@ LOCAL_NAVIGATION = 0
 GLOBAL_NAVIGATION = 1
 NAVIGATION_MODES = [LOCAL_NAVIGATION, GLOBAL_NAVIGATION]
 
-from .offboard_node import OffboardPathFollower
+from .trajgen_offboard_node import OffboardTrajgenFollower
 
 class SmoothTrajectoryTracker(OffboardTrajgenFollower):
 

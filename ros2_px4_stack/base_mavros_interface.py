@@ -60,7 +60,7 @@ class BasicMavrosInterface(Node):
         self.local_position = PoseStamped()
         self.mission_wp = WaypointList()
         self.mav_type = None
-        self.received_trajectory_setpoint = None
+        # self.received_trajectory_setpoint = None
 
         self.sub_topics_ready = {
             key: False
@@ -146,16 +146,16 @@ class BasicMavrosInterface(Node):
         )
         
         # Dynus subscriptions/publishers 
-        self.dynus_goal_topic = '/NX01/goal'
-        self.dynus_state_topic = '/NX01/state'
-        self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, qos_profile)
-        self.dynus_state_pub = self.create_publisher(StateDynus, self.dynus_state_topic, 1)
+        # self.dynus_goal_topic = '/NX01/goal'
+        # self.dynus_state_topic = '/NX01/state'
+        # self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, qos_profile)
+        # self.dynus_state_pub = self.create_publisher(StateDynus, self.dynus_state_topic, 1)
 
         # Traj Gen subscriptions/publishers 
-        self.trajgen_goal_topic =  '/SQ01/goal'
-        self.trajgen_state_topic = '/SQ01/state'
-        self.trajgen_goal_sub = self.create_subscription(GoalSnap, self.trajgen_goal_topic, self.repub_traj_cb, qos_profile)
-        self.trajgen_state_pub = self.create_publisher(StateSnap, self.trajgen_state_topic, 1)
+        # self.trajgen_goal_topic =  '/SQ01/goal'
+        # self.trajgen_state_topic = '/SQ01/state'
+        # self.trajgen_goal_sub = self.create_subscription(GoalSnap, self.trajgen_goal_topic, self.repub_traj_cb, qos_profile)
+        # self.trajgen_state_pub = self.create_publisher(StateSnap, self.trajgen_state_topic, 1)
 
         # ROS publishers
         self.mavlink_pub = self.create_publisher(Mavlink, "mavlink/to", qos_profile)
@@ -192,32 +192,32 @@ class BasicMavrosInterface(Node):
     #
     # Callback functions
     #
-    def repub_traj_cb(self, msg):
-        self.received_trajectory_setpoint = msg
+    # def repub_traj_cb(self, msg):
+    #     self.received_trajectory_setpoint = msg
 
-        trajgen_state = StateSnap(
-            header=Header(
-                stamp=self.get_clock().now().to_msg(),
-                frame_id="map"
-            ),
-            pos=Point(
-                x=self.local_position.pose.position.x,
-                y=self.local_position.pose.position.y,
-                z=self.local_position.pose.position.z
-            ),
-            quat=Quaternion(
-                x=self.local_position.pose.orientation.x,
-                y=self.local_position.pose.orientation.y,
-                z=self.local_position.pose.orientation.z,
-                w=self.local_position.pose.orientation.w
-            )
-        )
+    #     trajgen_state = StateSnap(
+    #         header=Header(
+    #             stamp=self.get_clock().now().to_msg(),
+    #             frame_id="map"
+    #         ),
+    #         pos=Point(
+    #             x=self.local_position.pose.position.x,
+    #             y=self.local_position.pose.position.y,
+    #             z=self.local_position.pose.position.z
+    #         ),
+    #         quat=Quaternion(
+    #             x=self.local_position.pose.orientation.x,
+    #             y=self.local_position.pose.orientation.y,
+    #             z=self.local_position.pose.orientation.z,
+    #             w=self.local_position.pose.orientation.w
+    #         )
+    #     )
 
-        self.trajgen_state_pub.publish(trajgen_state)
+    #     self.trajgen_state_pub.publish(trajgen_state)
 
 
-    def dynus_cb(self, msg):
-        self.received_trajectory_setpoint = msg
+    # def dynus_cb(self, msg):
+    #     self.received_trajectory_setpoint = msg
 
 
     def altitude_callback(self, data):
@@ -277,26 +277,26 @@ class BasicMavrosInterface(Node):
         if not self.sub_topics_ready["local_pos"]:
             self.sub_topics_ready["local_pos"] = True
 
-        #TODO: Find another place for this
-        dynus_state = StateDynus(
-            header=Header(
-                stamp=self.get_clock().now().to_msg(),
-                frame_id="map"
-            ),
-            pos=Vector3(
-                x=self.local_position.pose.position.x,
-                y=self.local_position.pose.position.y,
-                z=self.local_position.pose.position.z
-            ),
-            quat=Quaternion(
-                x=self.local_position.pose.orientation.x,
-                y=self.local_position.pose.orientation.y,
-                z=self.local_position.pose.orientation.z,
-                w=self.local_position.pose.orientation.w
-            )
-        )
+        # #TODO: Find another place for this
+        # dynus_state = StateDynus(
+        #     header=Header(
+        #         stamp=self.get_clock().now().to_msg(),
+        #         frame_id="map"
+        #     ),
+        #     pos=Vector3(
+        #         x=self.local_position.pose.position.x,
+        #         y=self.local_position.pose.position.y,
+        #         z=self.local_position.pose.position.z
+        #     ),
+        #     quat=Quaternion(
+        #         x=self.local_position.pose.orientation.x,
+        #         y=self.local_position.pose.orientation.y,
+        #         z=self.local_position.pose.orientation.z,
+        #         w=self.local_position.pose.orientation.w
+        #     )
+        # )
 
-        self.dynus_state_pub.publish(dynus_state)
+        # self.dynus_state_pub.publish(dynus_state)
 
 
     def mission_wp_callback(self, data):

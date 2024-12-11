@@ -73,7 +73,15 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
         qos_profile.durability = DurabilityPolicy.VOLATILE
         qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
 
+
+        # Traj gen sub/pub
+        self.trajgen_goal_topic =  '/SQ01/goal'
+        self.trajgen_state_topic = '/SQ01/state'
+        self.trajgen_goal_sub = self.create_subscription(GoalSnap, self.trajgen_goal_topic, self.repub_traj_cb, qos_profile)
+        self.trajgen_state_pub = self.create_publisher(StateSnap, self.trajgen_state_topic, 1)
+
         self.trajectory_setpoint = None
+        self.received_trajectory_setpoint = None
 
         # Start thread for trajectory publisher 
         self.trajectory_publish_thread = Thread(
@@ -106,12 +114,6 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
         qw = math.cos(yaw / 2.0)
 
         return [qx, qy, qz, qw]
-
-
-    #############################
-    ### Temp Traj Gen Changes ###
-    #############################
-    #TODO: Cleanly integrate into code
 
     def track_trajectory(self):
         # wait 1 second for FCU connection
@@ -172,6 +174,30 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
         )
 
         return trajectory_msg
+        
+
+    def repub_traj_cb(self, msg):
+        self.received_trajectory_setpoint = msg
+
+        trajgen_state = StateSnap(
+            header=Header(
+                stamp=self.get_clock().now().to_msg(),
+                frame_id="map"
+            ),
+            pos=Point(
+                x=self.local_position.pose.position.x,
+                y=self.local_position.pose.position.y,
+                z=self.local_position.pose.position.z
+            ),
+            quat=Quaternion(
+                x=self.local_position.pose.orientation.x,
+                y=self.local_position.pose.orientation.y,
+                z=self.local_position.pose.orientation.z,
+                w=self.local_position.pose.orientation.w
+            )
+        )
+
+        self.trajgen_state_pub.publish(trajgen_state)
 
 def main():
     rclpy.init()
