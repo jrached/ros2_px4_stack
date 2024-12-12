@@ -54,13 +54,4 @@ def generate_launch_description():
             # You can include a condition to make it required if needed
             # condition=LaunchConfigurationEquals('some_condition', 'true')
         ),
-
-        # Subscribe to broadcasted trajectories
-        Node(
-            package='ros2_px4_stack',
-            executable='offboard_node',
-            name='offboard_node_py',
-            output='screen',
-            # Again, you can include a condition to make it required
-        ),
     ])
