@@ -13,8 +13,6 @@ from rclpy.node import Node
 import math
 from threading import Thread
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, Transform, Twist, Vector3
-from dynus_interfaces.msg import Goal
-from dynus_interfaces.msg import State as StateDynus
 from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
 
 from snapstack_msgs2.msg import Goal as GoalSnap 

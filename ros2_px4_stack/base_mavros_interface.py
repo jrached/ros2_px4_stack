@@ -7,10 +7,6 @@ from rclpy.executors import ExternalShutdownException
 import math
 from threading import Thread
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, Vector3
-from dynus_interfaces.msg import Goal
-from dynus_interfaces.msg import State as StateDynus
-from snapstack_msgs2.msg import Goal as GoalSnap
-from snapstack_msgs2.msg import State as StateSnap
 from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
 from std_msgs.msg import Header
 from mavros import mavlink

@@ -6,7 +6,6 @@ from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy
 import math
 from threading import Thread
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, Transform, Twist, Vector3
-# from dynus_interfaces.msg import Goal
 from std_msgs.msg import Header
 from mavros import mavlink
 from mavros_msgs.msg import (
@@ -34,7 +33,6 @@ from pymavlink import mavutil
 from typing import List, Tuple
 from six.moves import xrange
 
-# from dynus_interfaces.msg import Goal
 from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
 
 from snapstack_msgs2.msg import Goal as GoalSnap
