@@ -33,7 +33,8 @@ setup(
             'track_gen_traj = ros2_px4_stack.track_gen_traj:main',
             'setpoint_offboard_node = ros2_px4_stack.setpoint_offboard_node:main',
             'trajgen_offboard_node = ros2_px4_stack.trajgen_offboard_node:main',
-            'dynus_offboard_node = ros2_px4_stack.dynus_offboard_node:main'
+            'dynus_offboard_node = ros2_px4_stack.dynus_offboard_node:main',
+            'repub_livox = ros2_px4_stack.repub_livox:main'
         ],
     },
 )
