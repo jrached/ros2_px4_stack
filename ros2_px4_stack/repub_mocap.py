@@ -24,21 +24,23 @@ class MocapRepublisher(Node):
         super().__init__('mocap_publisher')
 
         # get the current namespace
-        # NAMESPACE = self.get_namespace()
-        NAMESPACE = '/PX01/'
+        NAMESPACE = self.get_namespace()
 
         self.mocap_sub_topic_name = self.declare_parameter(
-            # "~mocap_sub_topic_name", "/optitrack" + NAMESPACE + "world"
-            "~mocap_sub_topic_name", NAMESPACE + "world"
+            "~mocap_sub_topic_name", NAMESPACE + "/world"
         ).value
 
-        self.mocap_vel_sub_topic_name = NAMESPACE + "mocap/twist"
+        self.mocap_vel_sub_topic_name = self.declare_parameter(
+            "~mocap_vel_sub_topic_name", NAMESPACE + "/mocap/twist"
+        ).value 
 
         self.mocap_pub_topic_name = self.declare_parameter(
             "~mocap_pub_topic_name",  "/mavros/vision_pose/pose"
         ).value
 
-        self.mocap_vel_pub_topic_name = "/mavros/vision_speed/speed_twist"
+        self.mocap_vel_pub_topic_name = self.declare_parameter(
+            "~mocap_vel_pub_topic_name", "/mavros/vision_speed/speed_twist"
+        ).value 
 
         self._mocap_sub = self.create_subscription(PoseStamped,
             self.mocap_sub_topic_name, self._mocap_cb, 10)

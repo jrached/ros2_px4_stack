@@ -17,6 +17,9 @@ class FixLivoxPose(Node):
     def __init__(self):
         super().__init__('fix_livox_pose')
 
+        #How to set namespace: ros2 run ros2_px4_stack fix_livox --ros-args --namespace BD01
+        ns = self.get_namespace()
+
         qos_profile = QoSProfile(depth=10)
         qos_profile.durability = DurabilityPolicy.VOLATILE
         qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
@@ -48,7 +51,7 @@ class FixLivoxPose(Node):
         # Get static transform between PX01 and base_link
         pose_stamped = PoseStamped()
         pose_stamped.pose = in_pose
-        if not self.tf_buffer.can_transform("PX01", "base_link", self.get_clock().now()):
+        if not self.tf_buffer.can_transform("BD01", "base_link", self.get_clock().now()):
             self.get_logger().info(f"Waiting for transform")
             rclpy.spin_once(self, timeout_sec=1.0)
 

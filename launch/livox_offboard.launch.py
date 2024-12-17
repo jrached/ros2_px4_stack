@@ -4,14 +4,15 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from launch.launch_description_sources import FrontendLaunchDescriptionSource
+from launch.substitutions import EnvironmentVariable
 import os
 
 def generate_launch_description():
     return LaunchDescription([
         # Declare launch arguments
-        DeclareLaunchArgument('hostname', default_value='nuc1'),
+        DeclareLaunchArgument('hostname', default_value='nuc6'),
         DeclareLaunchArgument('tgt_system', default_value='1.1'),
-        DeclareLaunchArgument('ns', default_value='PX01'),
+        DeclareLaunchArgument('ns', default_value=EnvironmentVariable("VEH_NAME")),
         DeclareLaunchArgument('fcu_url', default_value='/dev/ttyACM0:921600'),
         DeclareLaunchArgument('respawn_mavros', default_value='false'),
 

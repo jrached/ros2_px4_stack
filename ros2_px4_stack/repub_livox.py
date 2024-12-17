@@ -14,6 +14,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, TwistStamped
 import threading
 from threading import Thread
+from nav_msgs.msg import Odometry
 # from threading import Thread
 # from rclpy.executors import ExternalShutdownException 
 
@@ -24,20 +25,33 @@ class LivoxRepublisher(Node):
 
         self.livox_sub_topic_name = self.declare_parameter(
             
-            "~livox_sub_topic_name", "/dlio/odom_node/odom"
+            "~livox_sub_topic_name", "/dlio/odom_node/pose"
         ).value
+
+        self.livox_vel_sub_topic_name = self.declare_parameter(
+            "~livox_vel_sub_topic_name", "/dlio/odom_node/odom"
+        ).value 
 
         self.livox_pub_topic_name = self.declare_parameter(
             "~livox_pub_topic_name",  "/mavros/vision_pose/pose"
         ).value
 
+        self.livox_vel_pub_topic_name = self.declare_parameter(
+            "~livox_vel_pub_topic_name", "/mavros/vision_speed/speed_twist"
+        ).value 
+
         self._livox_sub = self.create_subscription(PoseStamped,
             self.livox_sub_topic_name, self._livox_cb, 10)
         self._last_msg = None
 
+        self._livox_vel_sub = self.create_subscription(Odometry, 
+            self.livox_vel_sub_topic_name, self._livox_vel_cb, 10)
+        self._last_vel_msg = None 
+
         # Publish at the specified rate in a separate thread
         self._pub_hz = pub_hz
         self._livox_pub = self.create_publisher(PoseStamped, self.livox_pub_topic_name, 10)
+        self._livox_vel_pub = self.create_publisher(TwistStamped, self.livox_vel_pub_topic_name, 10)
         self._pub_thread = Thread(target=self._publish_loop, args=())
         self._pub_thread.daemon = True
         self._pub_thread.start()
@@ -46,11 +60,21 @@ class LivoxRepublisher(Node):
     def _livox_cb(self, msg):
         self._last_msg = msg
 
+    def _livox_vel_cb(self, msg):
+        twist_stamped = TwistStamped()
+        twist_stamped.header.stamp = msg.header.stamp
+        twist_stamped.header.frame_id = msg.header.frame_id 
+        twist_stamped.twist = msg.twist.twist 
+
+        self._last_vel_msg = twist_stamped 
+
     def _publish_loop(self):
         rate = self.create_rate(self._pub_hz)
         while rclpy.ok():
             if self._last_msg:
                 self._livox_pub.publish(self._last_msg)
+            if self._last_vel_msg: 
+                self._livox_vel_pub.publish(self._last_vel_msg)
             rate.sleep()
 
 def main():

@@ -2,11 +2,10 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, LogInfo
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-from launch.substitutions import LaunchConfigurations, EnvironmentVariable 
+from launch.substitutions import LaunchConfiguration, EnvironmentVariable
 import os 
 
 def generate_launch_description():
-    namespace = LaunchConfiguration("ns")
     return LaunchDescription([
         # Declare launch arguments
         DeclareLaunchArgument('argname', default_value='val'),
@@ -17,8 +16,8 @@ def generate_launch_description():
         DeclareLaunchArgument('respawn_mavros', default_value='false'),
         Node(
             package='ros2_px4_stack',
-            executable='track_square_node',
-            name='track_square_node_py',
+            executable='track_gen_traj',
+            name='track_gen_traj_py',
             output='screen',
         ),
         Node(
@@ -35,9 +34,8 @@ def generate_launch_description():
         ),
         Node(
             package='ros2_px4_stack',
-            executable='repub_mocap',
-            name='repub_mocap_py',
-            namespace=namespace,
+            executable='repub_livox',
+            name='repub_livox_py',
             output='screen',
         ),
     ])

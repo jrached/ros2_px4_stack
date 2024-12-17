@@ -2,15 +2,17 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, LogInfo
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
+from launch.substitutions import LaunchConfiguration, EnvironmentVariable 
 import os 
 
 def generate_launch_description():
+    namespace = LaunchConfiguration("ns")
     return LaunchDescription([
         # Declare launch arguments
         DeclareLaunchArgument('argname', default_value='val'),
-        DeclareLaunchArgument('hostname', default_value='nuc1'),
+        DeclareLaunchArgument('hostname', default_value='nuc6'),
         DeclareLaunchArgument('tgt_system', default_value='1.1'),
-        DeclareLaunchArgument('ns', default_value='PX01'),
+        DeclareLaunchArgument('ns', default_value=EnvironmentVariable("VEH_NAME")),
         DeclareLaunchArgument('fcu_url', default_value='/dev/ttyACM0:921600'),
         DeclareLaunchArgument('respawn_mavros', default_value='false'),
         Node(
@@ -35,6 +37,7 @@ def generate_launch_description():
             package='ros2_px4_stack',
             executable='repub_mocap',
             name='repub_mocap_py',
+            namespace=namespace,
             output='screen',
         ),
     ])
