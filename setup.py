@@ -29,7 +29,6 @@ setup(
             'repub_mocap = ros2_px4_stack.repub_mocap:main',
             'track_square_node = ros2_px4_stack.track_square_node:main',
             'track_dynus_traj = ros2_px4_stack.track_dynus_traj:main',
-            'fix_livox_pose = ros2_px4_stack.fix_livox_pose:main',
             'track_gen_traj = ros2_px4_stack.track_gen_traj:main',
             'setpoint_offboard_node = ros2_px4_stack.setpoint_offboard_node:main',
             'trajgen_offboard_node = ros2_px4_stack.trajgen_offboard_node:main',
