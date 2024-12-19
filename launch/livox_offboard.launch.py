@@ -8,6 +8,7 @@ from launch.substitutions import EnvironmentVariable
 import os
 
 def generate_launch_description():
+    namespace = LaunchConfiguration("ns")
     return LaunchDescription([
         # Declare launch arguments
         DeclareLaunchArgument('hostname', default_value='nuc6'),
@@ -41,6 +42,7 @@ def generate_launch_description():
             package='ros2_px4_stack',
             executable='repub_livox',
             name='repub_livox_py',
+            namespace=namespace,
             output='screen',
             # You can include a condition to make it required if needed
             # condition=LaunchConfigurationEquals('some_condition', 'true')

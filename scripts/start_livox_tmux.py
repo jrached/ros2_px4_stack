@@ -51,11 +51,10 @@ if __name__ == "__main__":
         "ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for pane 2
         "ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
         "ros2 launch ros2_px4_stack livox_gen_traj.launch.py",  # Command for pane 4,
-        # "ros2 launch plotting repub_all.launch.py", 
-        "ros2 launch livox_ros_driver2 rviz_MID360_launch.py", # Pane 5
-        "ros2 launch direct_lidar_inertial_odometry dlio.launch.py", # Pane 6
-        "sleep 10.0 && cd bags && cd test && rm -rf rosbag* && ros2 bag record /SQ01/goal /mavros/local_position/pose /mavros/local_position/velocity_local /dlio/odom_node/pose", # Pane 7
+        f"ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 5
+        f"ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 6
+        f"sleep 10.0 && cd bags && cd test && rm -rf rosbag* && ros2 bag record /SQ01/goal /mavros/local_position/pose /mavros/local_position/velocity_local /{veh}/dlio/odom_node/pose", # Pane 7
         "ros2 topic echo /mavros/local_position/pose", # Pane 8
-        "ros2 topic echo /dlio/odom_node/pose", # Pane  9
+        f"sleep 10.0 && ros2 topic echo /{veh}/dlio/odom_node/pose", # Pane  9
     ]
     run_tmux_commands(session_name, commands)

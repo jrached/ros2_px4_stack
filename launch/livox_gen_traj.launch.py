@@ -6,6 +6,7 @@ from launch.substitutions import LaunchConfiguration, EnvironmentVariable
 import os 
 
 def generate_launch_description():
+    namespace = LaunchConfiguration("ns")
     return LaunchDescription([
         # Declare launch arguments
         DeclareLaunchArgument('argname', default_value='val'),
@@ -36,6 +37,7 @@ def generate_launch_description():
             package='ros2_px4_stack',
             executable='repub_livox',
             name='repub_livox_py',
+            namespace=namespace,
             output='screen',
         ),
     ])

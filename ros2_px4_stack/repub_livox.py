@@ -23,13 +23,14 @@ class LivoxRepublisher(Node):
     def __init__(self, pub_hz=30.0):
         super().__init__('livox_publisher')
 
+        namespace = self.get_namespace()
+
         self.livox_sub_topic_name = self.declare_parameter(
-            
-            "~livox_sub_topic_name", "/dlio/odom_node/pose"
+            "~livox_sub_topic_name", namespace + "/dlio/odom_node/pose"
         ).value
 
         self.livox_vel_sub_topic_name = self.declare_parameter(
-            "~livox_vel_sub_topic_name", "/dlio/odom_node/odom"
+            "~livox_vel_sub_topic_name", namespace + "/dlio/odom_node/odom"
         ).value 
 
         self.livox_pub_topic_name = self.declare_parameter(
