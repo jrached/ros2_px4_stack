@@ -26,20 +26,20 @@ def generate_launch_description():
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
-            name='odom_to_mavros_tf',
+            name='odom_to_mavros',
             arguments=['0', '0', '0', '-1.57', '3.14', '0', 'odom', 'world_mavros']
         ),
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
-            name='odom_to_world',
-            arguments=['0', '0', '0', '0', '0', '0', 'world', 'odom']
+            name='odom_to_mocap',
+            arguments=['1.457', '-3.192', '1.314', '1.576', '0', '0', 'world_mocap', 'odom'] #TODO: Change to initial conditions 
         ),
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
-            name='map_to_world',
-            arguments=['0', '0', '0', '0', '0', '0', 'world', 'map']
+            name='map_to_odom',
+            arguments=['0', '0', '0', '0', '0', '0', 'odom', 'map']
         ),
         Node(
             package='tf2_ros',
