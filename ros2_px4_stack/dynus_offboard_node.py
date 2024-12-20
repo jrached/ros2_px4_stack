@@ -6,7 +6,7 @@ ros2 equivalent (what rate are they sleeping on?). If this causes any trouble
 we can try uncommenting the hacky wait_for_seconds() method and using that instead.
 Be careful because the function is blocking and ros might yell at you 
 """
-
+import os
 import rclpy
 from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy
 from rclpy.node import Node
@@ -77,8 +77,9 @@ class OffboardDynusFollower(BasicMavrosInterface):
         self.received_trajectory_setpoint = None
 
         # Dynus subscriptions/publishers 
-        self.dynus_goal_topic = '/NX01/goal'
-        self.dynus_state_topic = '/NX01/state'
+        veh = os.environ.get("VEH_NAME")
+        self.dynus_goal_topic = f'/{veh}/goal'
+        self.dynus_state_topic = f'/{veh}/state'
         self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, qos_profile)
         self.dynus_state_pub = self.create_publisher(StateDynus, self.dynus_state_topic, 1)
         
@@ -117,7 +118,7 @@ class OffboardDynusFollower(BasicMavrosInterface):
             )
         )
 
-        self.dynus_state_pub.publish(dynus_state)
+        # self.dynus_state_pub.publish(dynus_state)
 
     def _publish_trajectory_setpoint(self):
         rate = 50 #Hz

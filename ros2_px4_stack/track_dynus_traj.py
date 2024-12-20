@@ -41,7 +41,7 @@ LOCAL_NAVIGATION = 0
 GLOBAL_NAVIGATION = 1
 NAVIGATION_MODES = [LOCAL_NAVIGATION, GLOBAL_NAVIGATION]
 
-from .dynus_offboard_node import OffboarDynusFollower
+from .dynus_offboard_node import OffboardDynusFollower
 
 class SmoothTrajectoryTracker(OffboardDynusFollower):
 
@@ -62,7 +62,7 @@ class SmoothTrajectoryTracker(OffboardDynusFollower):
 def main(args=None):
     rclpy.init(args=args)
     traj_tracker = SmoothTrajectoryTracker()
-    traj_tracker.track_trajectory(altitude = 2.5)
+    traj_tracker.track_trajectory(altitude = 1.8)
 
 if __name__ == '__main__':
     main()

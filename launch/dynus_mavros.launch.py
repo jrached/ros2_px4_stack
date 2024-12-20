@@ -7,6 +7,7 @@ import os
 
 def generate_launch_description():
     namespace = LaunchConfiguration("ns")
+    veh = os.environ.get("VEH_NAME")
     return LaunchDescription([
         # Declare launch arguments
         DeclareLaunchArgument('argname', default_value='val'),
@@ -24,19 +25,33 @@ def generate_launch_description():
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
-            name='mocap_to_mavros_tf',
-            arguments=['0', '0', '0', '-1.57', '3.14', '0', 'world_mocap', 'world_mavros']
+            name='odom_to_mavros_tf',
+            arguments=['0', '0', '0', '-1.57', '3.14', '0', 'odom', 'world_mavros']
         ),
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
-            name='mocap_to_world',
-            arguments=['0', '0', '0', '0', '0', '0', 'world', 'world_mocap']
+            name='odom_to_world',
+            arguments=['0', '0', '0', '0', '0', '0', 'world', 'odom']
         ),
         Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='map_to_world',
+            arguments=['0', '0', '0', '0', '0', '0', 'world', 'map']
+        ),
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='base_link_to_ns',
+            arguments=['0', '0', '0', '0', '0', '0', f"/{veh}/base_link", '/base_link'] #TODO: Change BD01 to namespace or smth
+        ),
+
+        # Launch the repub_mocap node
+        Node(
             package='ros2_px4_stack',
-            executable='repub_mocap',
-            name='repub_mocap_py',
+            executable='repub_livox',
+            name='repub_livox_py',
             namespace=namespace,
             output='screen',
         ),

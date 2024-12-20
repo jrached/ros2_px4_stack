@@ -4,11 +4,12 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from launch.launch_description_sources import FrontendLaunchDescriptionSource
-from launch.substitutions import EnvironmentVariable
+from launch.substitutions import EnvironmentVariable, LaunchConfiguration, TextSubstitution
 import os
 
 def generate_launch_description():
     namespace = LaunchConfiguration("ns")
+    veh = os.environ.get("VEH_NAME")
     return LaunchDescription([
         # Declare launch arguments
         DeclareLaunchArgument('hostname', default_value='nuc6'),
@@ -36,6 +37,12 @@ def generate_launch_description():
             name='map_to_world',
             arguments=['0', '0', '0', '0', '0', '0', 'world', 'map']
         ),
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='base_link_to_ns',
+            arguments=['0', '0', '0', '0', '0', '0', f"/{veh}/base_link", '/base_link'] #TODO: Change BD01 to namespace or smth
+        ),
 
         # Launch the repub_mocap node
         Node(
@@ -44,7 +51,5 @@ def generate_launch_description():
             name='repub_livox_py',
             namespace=namespace,
             output='screen',
-            # You can include a condition to make it required if needed
-            # condition=LaunchConfigurationEquals('some_condition', 'true')
         ),
     ])
