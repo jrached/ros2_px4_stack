@@ -210,7 +210,7 @@ class OffboardDynusFollower(BasicMavrosInterface):
         # wait 1 second for FCU connection
         self.wait_for_seconds(1)
 
-        flight_state = "TAKEOFF"
+        flight_state = "TAKEOFF" #TODO: Change back to TAKEOFF
         takeoff_pos = self.point_to_traj([self.local_position.pose.position.x, self.local_position.pose.position.y, altitude])
         init_pos = self.point_to_traj([0.0, 0.0, altitude])
 

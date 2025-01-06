@@ -32,7 +32,8 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             name='odom_to_mocap',
-            arguments=['1.457', '-3.192', '1.314', '1.576', '0', '0', 'world_mocap', 'odom'] #TODO: Change to initial conditions 
+            arguments=['-4.5', '0.0', '0.3', '0.0', '0', '0', 'world_mocap', 'odom'], #TODO: Change to initial pose
+            # arguments=['1.457', '-3.192', '1.314', '1.576', '0', '0', 'world_mocap', 'odom'] #TODO: Change to initial pose #Usual initial pose
         ),
         Node(
             package='tf2_ros',
@@ -45,6 +46,12 @@ def generate_launch_description():
             executable='static_transform_publisher',
             name='base_link_to_ns',
             arguments=['0', '0', '0', '0', '0', '0', f"/{veh}/base_link", '/base_link'] #TODO: Change BD01 to namespace or smth
+        ),
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='base_to_d455',
+            arguments=['0', '0', '0', '0', '0', '0', f"{veh}/base_link", f"{veh}/d455_link"]
         ),
 
         # Launch the repub_mocap node
