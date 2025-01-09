@@ -34,11 +34,11 @@ class LivoxRepublisher(Node):
         ).value 
 
         self.livox_pub_topic_name = self.declare_parameter(
-            "~livox_pub_topic_name",  "/mavros/vision_pose/pose"
+            "~livox_pub_topic_name",  namespace + "/mavros/vision_pose/pose"
         ).value
 
         self.livox_vel_pub_topic_name = self.declare_parameter(
-            "~livox_vel_pub_topic_name", "/mavros/vision_speed/speed_twist"
+            "~livox_vel_pub_topic_name", namespace + "/mavros/vision_speed/speed_twist"
         ).value 
 
         self._livox_sub = self.create_subscription(PoseStamped,

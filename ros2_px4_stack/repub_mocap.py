@@ -35,11 +35,11 @@ class MocapRepublisher(Node):
         ).value 
 
         self.mocap_pub_topic_name = self.declare_parameter(
-            "~mocap_pub_topic_name",  "/mavros/vision_pose/pose"
+            "~mocap_pub_topic_name",  NAMESPACE + "/mavros/vision_pose/pose"
         ).value
 
         self.mocap_vel_pub_topic_name = self.declare_parameter(
-            "~mocap_vel_pub_topic_name", "/mavros/vision_speed/speed_twist"
+            "~mocap_vel_pub_topic_name", NAMESPACE + "/mavros/vision_speed/speed_twist"
         ).value 
 
         self._mocap_sub = self.create_subscription(PoseStamped,

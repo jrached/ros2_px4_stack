@@ -17,8 +17,8 @@ from dynus_interfaces.msg import Goal
 from dynus_interfaces.msg import State as StateDynus
 from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
 
-from snapstack_msgs2.msg import Goal as GoalSnap 
-from snapstack_msgs2.msg import State as StateSnap
+# from snapstack_msgs2.msg import Goal as GoalSnap 
+# from snapstack_msgs2.msg import State as StateSnap
 
 from std_msgs.msg import Header
 from mavros import mavlink

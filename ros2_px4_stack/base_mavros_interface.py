@@ -80,7 +80,7 @@ class BasicMavrosInterface(Node):
         self.wp_clear_srv = self.create_client(WaypointClear, "mavros/mission/clear")
         self.wp_push_srv = self.create_client(WaypointPush, "mavros/mission/push")
 
-        service_timeout = 10
+        service_timeout = 5
         self.get_logger().info("waiting for ROS services")
         try:
             if self.get_param_srv.wait_for_service(service_timeout):
