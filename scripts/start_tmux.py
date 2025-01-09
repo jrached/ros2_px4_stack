@@ -47,7 +47,7 @@ if __name__ == "__main__":
     veh = os.environ.get("VEH_NAME")
     session_name = f"{veh}_tmux_session"
     commands = [
-        "ros2 launch mavros px4.launch",  # Command for pane 1
+        f"ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:=1",  # Command for pane 1
         "ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for pane 2
         "ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
         "ros2 launch ros2_px4_stack offboard_gen_traj.launch.py",  # Command for pane 4,

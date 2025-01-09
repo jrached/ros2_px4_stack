@@ -47,14 +47,14 @@ if __name__ == "__main__":
     veh = os.environ.get("VEH_NAME")
     session_name = f"{veh}_tmux_session"
     commands = [
-        "ros2 launch mavros px4.launch",  # Command for pane 1
+        f"ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:=1",  # Command for pane 1
         "ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for pane 2
         "ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
         "ros2 launch ros2_px4_stack livox_gen_traj.launch.py",  # Command for pane 4,
         f"ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 5
         f"ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 6
-        f"sleep 10.0 && cd bags && cd test && rm -rf rosbag* && ros2 bag record /SQ01/goal /mavros/local_position/pose /mavros/local_position/velocity_local /{veh}/dlio/odom_node/pose", # Pane 7
-        "ros2 topic echo /mavros/local_position/pose", # Pane 8
+        f"sleep 10.0 && cd bags && cd test && rm -rf rosbag* && ros2 bag record /SQ01/goal {veh}/mavros/local_position/pose {veh}/mavros/local_position/velocity_local /{veh}/dlio/odom_node/pose", # Pane 7
+        f"ros2 topic echo {veh}/mavros/local_position/pose", # Pane 8
         f"sleep 10.0 && ros2 topic echo /{veh}/dlio/odom_node/pose", # Pane  9
     ]
     run_tmux_commands(session_name, commands)
