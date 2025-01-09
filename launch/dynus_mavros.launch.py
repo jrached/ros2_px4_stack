@@ -20,6 +20,7 @@ def generate_launch_description():
             package='ros2_px4_stack',
             executable='track_dynus_traj',
             name='track_dynus_traj_py',
+            namespace=namespace,
             output='screen',
         ),
         Node(
