@@ -32,8 +32,8 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             name='odom_to_mocap',
-            arguments=['-4.5', '0.0', '0.3', '0.0', '0', '0', 'world_mocap', 'odom'], #TODO: Change to initial pose
-            # arguments=['1.457', '-3.192', '1.314', '1.576', '0', '0', 'world_mocap', 'odom'] #TODO: Change to initial pose #Usual initial pose
+            arguments=['-4.5', '0.0', '0.3', '0.0', '0', '0', 'world_mocap', 'odom'], # podium initial pos (for dynus testing) TODO: Change to initial pose
+            # arguments=['1.457', '-3.192', '1.314', '1.576', '0', '0', 'world_mocap', 'odom'] #table close to the control room TODO: Change to initial pose #Usual initial pose
         ),
         Node(
             package='tf2_ros',
