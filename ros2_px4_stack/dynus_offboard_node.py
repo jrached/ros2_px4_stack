@@ -75,10 +75,8 @@ class OffboardDynusFollower(BasicMavrosInterface):
 
         # Dynus subscriptions/publishers 
         veh = os.environ.get("VEH_NAME")
-        self.dynus_goal_topic = f'/{veh}/goal'
-        self.dynus_state_topic = f'/{veh}/state'
+        self.dynus_goal_topic = f'/{veh}/agent_frame_goal'
         self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, qos_profile)
-        self.dynus_state_pub = self.create_publisher(StateDynus, self.dynus_state_topic, 1)
         
         # Start thread for trajectory publisher 
         self.trajectory_publish_thread = Thread(
@@ -96,26 +94,6 @@ class OffboardDynusFollower(BasicMavrosInterface):
 
     def dynus_cb(self, msg):
         self.received_trajectory_setpoint = msg
-        
-        dynus_state = StateDynus(
-            header=Header(
-                stamp=self.get_clock().now().to_msg(),
-                frame_id="map"
-            ),
-            pos=Vector3(
-                x=self.local_position.pose.position.x,
-                y=self.local_position.pose.position.y,
-                z=self.local_position.pose.position.z
-            ),
-            quat=Quaternion(
-                x=self.local_position.pose.orientation.x,
-                y=self.local_position.pose.orientation.y,
-                z=self.local_position.pose.orientation.z,
-                w=self.local_position.pose.orientation.w
-            )
-        )
-
-        # self.dynus_state_pub.publish(dynus_state)
 
     def _publish_trajectory_setpoint(self):
         rate = 50 #Hz

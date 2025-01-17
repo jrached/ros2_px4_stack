@@ -28,22 +28,34 @@ class MocapToLivoxFrame(Node):
         qos_profile.durability = DurabilityPolicy.VOLATILE
         qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
 
-        # Make mocap subscription
-        self.pose_subscription = self.create_subscription(PoseStamped, f"/{veh}/world", self.pose_cb, 10)
-        self.twist_subscription = self.create_subscription(TwistStamped, f"/{veh}/mocap/twist", self.twist_cb, 10) 
+        # Make dynus goal topic subscription 
+        self.dynus_subscription = self.create_subscription(Goal, f"/{veh}/goal", self.transform_cb, 10)
+
+        # Make dynus goal topic publisher 
+        self.dynus_publisher = self.create_publisher(Goal, f"/{veh}/agent_frame_goal", 10)
+
+        # Make transform listener
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
+
+
+        ### For Debugging ### 
+        # # Make mocap subscription
+        # self.pose_subscription = self.create_subscription(PoseStamped, f"/{veh}/world", self.pose_cb, 10)
+        # self.twist_subscription = self.create_subscription(TwistStamped, f"/{veh}/mocap/twist", self.twist_cb, 10) 
+        
+        # Define velocity publisher 
+        # self.vel_publisher = self.create_publisher(TwistStamped, f"/{veh}/livox_vel_estimate", 10)
 
         # Make timer for transform broadcaster
-        pub_freq = 100 # Hz 
-        timer_period = 1 / pub_freq 
-        self.timer = self.create_timer(timer_period, self.broadcast_livox_frame)
+        # pub_freq = 50 # Hz 
+        # timer_period = 1 / pub_freq 
+        # self.timer = self.create_timer(timer_period, self.broadcast_livox_frame)
 
         # Class variables to store mocap pose and twist
         self.mocap_pose = None
         self.mocap_twist = None 
 
-        # Make transform listener
-        self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self)
 
     def get_transform(self):
         # Get static transform betweenf livox initial position and mocap origin
@@ -182,7 +194,7 @@ class MocapToLivoxFrame(Node):
         livox_goal.yaw = new_yaw 
         livox_goal.dyaw = dyaw 
 
-        return livox_goal  
+        self.dynus_publisher.publish(livox_goal)   
 
     def pose_cb(self, msg):
         self.mocap_pose = msg 
@@ -208,13 +220,12 @@ class MocapToLivoxFrame(Node):
             new_v = self.transform_vel(v)
             # 3. Call a function that given a vector3 acceleration returns a vecotr3 acceleration in new frame. 
             
+            # Populate and broadcast transform
             tfs = TransformStamped()
-
             tfs.header.stamp = self.get_clock().now().to_msg()
             tfs.header.frame_id = f"{veh}/init_pose"
             tfs.child_frame_id = f"{veh}/livox_estimate"
             tfs.transform.translation = new_p 
-
             quat = quaternion_from_euler(0, 0, new_yaw)
             tfs.transform.rotation.x = quat[0] 
             tfs.transform.rotation.y = quat[1] 
@@ -222,6 +233,15 @@ class MocapToLivoxFrame(Node):
             tfs.transform.rotation.w = quat[3]
 
             broadcaster.sendTransform(tfs) 
+
+            # Populate and publish velocity message
+            lv_vel = TwistStamped()
+            lv_vel.header.stamp = self.get_clock().now().to_msg()
+            lv_vel.header.frame_id = "livox_vel"
+            lv_vel.twist.linear = new_v
+            lv_vel.twist.angular.z = dyaw
+
+            self.vel_publisher.publish(lv_vel)
 
 
 ########################
