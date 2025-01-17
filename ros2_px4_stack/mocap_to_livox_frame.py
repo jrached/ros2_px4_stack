@@ -47,11 +47,11 @@ class MocapToLivoxFrame(Node):
 
     def get_transform(self):
         # Get static transform betweenf livox initial position and mocap origin
-        while not self.tf_buffer.can_transform(f"/{veh}/init_pose", "world_mocap", self.get_clock().now()):
+        while not self.tf_buffer.can_transform(f"{veh}/init_pose", "world_mocap", self.get_clock().now()):
             self.get_logger().info(f"Waiting for transform")
             rclpy.spin_once(self, timeout_sec=1.0)
 
-        return self.tf_buffer.lookup_transform(f"/{veh}/init_pose", "world_mocap", self.get_clock().now())
+        return self.tf_buffer.lookup_transform(f"{veh}/init_pose", "world_mocap", self.get_clock().now())
 
 
     def transform_pose(self, pos, yaw):    
@@ -69,16 +69,21 @@ class MocapToLivoxFrame(Node):
         ps.pose.position.x = pos.x
         ps.pose.position.y = pos.y
         ps.pose.position.z = pos.z
-        ps.pose.orientation = quaternion_from_euler(0, 0, yaw) #Might not need this at all. 
+
+        quat = quaternion_from_euler(0, 0, yaw)
+        ps.pose.orientation.x = quat[0] 
+        ps.pose.orientation.y = quat[1] 
+        ps.pose.orientation.z = quat[2] 
+        ps.pose.orientation.w = quat[3] 
 
         tf = self.get_transform()
-        new_ps = do_transform_pose(ps, tf)
+        new_ps = do_transform_pose(ps.pose, tf)
 
         pos = Vector3()
-        pos.x = new_ps.pose.position.x
-        pos.y = new_ps.pose.position.y
-        pos.z = new_ps.pose.position.z
-        yaw = euler_from_quat(new_ps.pose.orientation)[-1]
+        pos.x = new_ps.position.x
+        pos.y = new_ps.position.y
+        pos.z = new_ps.position.z
+        yaw = euler_from_quat(new_ps.orientation)[-1]
 
         return pos, yaw  
 
@@ -103,9 +108,9 @@ class MocapToLivoxFrame(Node):
         rot_only_tf = TransformStamped()
         rot_only_tf.header = tf.header 
         rot_only_tf.child_frame_id = tf.child_frame_id
-        rot_only_tf.transform.translation.x = 0
-        rot_only_tf.transform.translation.y = 0
-        rot_only_tf.transform.translation.z = 0
+        rot_only_tf.transform.translation.x = 0.0
+        rot_only_tf.transform.translation.y = 0.0
+        rot_only_tf.transform.translation.z = 0.0
         rot_only_tf.transform.rotation = tf.transform.rotation 
 
         # Construct vector3stamped from vector3 
@@ -132,9 +137,9 @@ class MocapToLivoxFrame(Node):
         rot_only_tf = TransformStamped()
         rot_only_tf.header = tf.header 
         rot_only_tf.child_frame_id = tf.child_frame_id
-        rot_only_tf.transform.translation.x = 0
-        rot_only_tf.transform.translation.y = 0
-        rot_only_tf.transform.translation.z = 0
+        rot_only_tf.transform.translation.x = 0.0
+        rot_only_tf.transform.translation.y = 0.0
+        rot_only_tf.transform.translation.z = 0.0
         rot_only_tf.transform.rotation = tf.transform.rotation
 
         # Construct vector3stamped from vector3 
@@ -145,7 +150,7 @@ class MocapToLivoxFrame(Node):
 
         return do_transform_vector3(v3s, rot_only_transform).vector
 
-    def transform_cb(self, msg)""
+    def transform_cb(self, msg):
         """
         Given a dynus p, v, a, j, y, dyaw command in mocap frame,
         return a dynus p, v, a, j, y, dyaw command in livox frame.
@@ -185,34 +190,38 @@ class MocapToLivoxFrame(Node):
     def twist_cb(self, msg):
         self.mocap_twist = msg 
 
-    def broadcast_livox_frame(self)""
+    def broadcast_livox_frame(self):
         """
         Given pose and twist in mocap frame ,
         return pose and twist in livox frame.
         """
-        p = self.mocap_pose.pose.position 
-        v = self.mocap_twist.twist.linear 
-        yaw = euler_from_quat(self.mocap_pose.pose.orientation)[-1]
-        dyaw = self.mocap_twist.twist.angular.z
+        if self.mocap_pose and self.mocap_twist:
+            p = self.mocap_pose.pose.position 
+            v = self.mocap_twist.twist.linear 
+            yaw = euler_from_quat(self.mocap_pose.pose.orientation)[-1]
+            dyaw = self.mocap_twist.twist.angular.z
 
-        #TODO Implement 
-        # 1. Call a function that given a vector3 position and yaw returns vector3 position and yaw but in new frame
-        new_p, new_yaw = self.transform_pose(p, yaw)
-        # 2. Call a function that given a vector3 velocity returns vector3 velocity but in new frame
-        new_v = self.transform_vel(v)
-        # 3. Call a function that given a vector3 acceleration returns a vecotr3 acceleration in new frame. 
-        
-        tfs = TransformStamped()
+            #TODO Implement 
+            # 1. Call a function that given a vector3 position and yaw returns vector3 position and yaw but in new frame
+            new_p, new_yaw = self.transform_pose(p, yaw)
+            # 2. Call a function that given a vector3 velocity returns vector3 velocity but in new frame
+            new_v = self.transform_vel(v)
+            # 3. Call a function that given a vector3 acceleration returns a vecotr3 acceleration in new frame. 
+            
+            tfs = TransformStamped()
 
-        tfs.header.stamp = self.get_clock().now().to_msg()
-        tfs.header.stamp.frame_id = f"/{veh}/init_pose"
-        tfs.child_frame_id = f"/{veh}/livox_estimate"
-        tfs.transform.translation = new_p 
-        tfs.transform.rotation = quaternion_from_euler(0, 0, new_yaw) 
+            tfs.header.stamp = self.get_clock().now().to_msg()
+            tfs.header.frame_id = f"{veh}/init_pose"
+            tfs.child_frame_id = f"{veh}/livox_estimate"
+            tfs.transform.translation = new_p 
 
-        broadcaster.sendTransform(tfs) 
+            quat = quaternion_from_euler(0, 0, new_yaw)
+            tfs.transform.rotation.x = quat[0] 
+            tfs.transform.rotation.y = quat[1] 
+            tfs.transform.rotation.z = quat[2] 
+            tfs.transform.rotation.w = quat[3]
 
-        return livox_goal  
+            broadcaster.sendTransform(tfs) 
 
 
 ########################
@@ -268,10 +277,9 @@ def euler_from_quat(quaternion):
 def main(args=None):
     rclpy.init(args=args)
     node = MocapToLivoxFrame()
-    rclpy.spin(node)
 
     global broadcaster
-    broadcaster =  TransformBroadcaster(node)
+    broadcaster = TransformBroadcaster(node)
     try: 
         rclpy.spin(node)
     except KeyboardInterrupt: 
