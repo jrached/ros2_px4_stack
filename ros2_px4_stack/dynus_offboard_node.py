@@ -75,7 +75,7 @@ class OffboardDynusFollower(BasicMavrosInterface):
 
         # Dynus subscriptions/publishers 
         veh = os.environ.get("VEH_NAME")
-        self.dynus_goal_topic = f'/{veh}/agent_frame_goal'
+        self.dynus_goal_topic = f'/{veh}/goal'
         self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, qos_profile)
         
         # Start thread for trajectory publisher 
