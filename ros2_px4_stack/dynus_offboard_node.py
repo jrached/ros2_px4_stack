@@ -187,7 +187,6 @@ class OffboardDynusFollower(BasicMavrosInterface):
 
         flight_state = "TAKEOFF"
         takeoff_pos = self.point_to_traj([self.local_position.pose.position.x, self.local_position.pose.position.y, altitude])
-        init_pos = self.point_to_traj([0.0, 0.0, altitude])
 
         while rclpy.ok():
             if flight_state == "TAKEOFF":
@@ -195,20 +194,11 @@ class OffboardDynusFollower(BasicMavrosInterface):
 
                 self.trajectory_setpoint = takeoff_pos
 
-                if (self.traj_point_reached(takeoff_pos)):
+                if (self.traj_point_reached(takeoff_pos)
+                    and self.received_trajectory_setpoint is not None):
                     self.get_logger().info("Takeoff Complete")
-                    flight_state = "INITPOS"
-
-            elif flight_state == "INITPOS":
-                self.get_logger().info("Going To Initial Position")
-
-                self.trajectory_setpoint = init_pos
-
-                if (self.traj_point_reached(init_pos)
-                    and self.received_trajectory_setpoint is not None
-                ):
-                    self.get_logger().info("Reached Initial Position")
                     flight_state = "TRAJECTORY"
+                    init_pos = takeoff_pos
 
             elif flight_state == "TRAJECTORY":
                 self.get_logger().info("Following Trajectory")
