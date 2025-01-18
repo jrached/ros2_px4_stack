@@ -63,4 +63,13 @@ def generate_launch_description():
             namespace=namespace,
             output='screen',
         ),
+
+        # Run mocap to livox command frame conversion
+        Node(
+            package='ros2_px4_stack', 
+            executable='mocap_to_livox_frame',
+            name='mocap_to_livox_frame',
+            namespace=namespace,
+            output='screen', 
+        )
     ])
