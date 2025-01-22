@@ -196,8 +196,7 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
 ########################
 ### Helper Functions ###
 ########################
-
-def get_orientation(point):
+def get_drone_frame(point):
     g = 9.81
 
     # Construct differentially flat vectors 
@@ -211,15 +210,42 @@ def get_orientation(point):
     # Compute intermediate yaw vector x_C
     x_C = np.array([[np.cos(sigma[3][0]), np.sin(sigma[3][0]), 0]]).T
 
-    # Compute x--axis and y-axis of drone frame measured in world frame
+    # Compute x-axis and y-axis of drone frame measured in world frame
     cross_prod = np.cross(z_B.T[0], x_C.T[0]) 
     y_B = np.array([cross_prod / np.linalg.norm(cross_prod)]).T 
     x_B = np.array([np.cross(y_B.T[0], z_B.T[0])]).T 
 
-    # Compute populate rotation matrix of drone frame measured from world frame
+    return x_B, y_B, z_B 
+
+def get_orientation(point):
+    x_B, y_B, z_B = get_drone_frame(point)
+
+    # Populate rotation matrix of drone frame measured from world frame
     R_W_B = np.hstack((x_B, y_B, z_B))
+
     return Rotation.from_matrix(R_W_B).as_quat() # As [x, y, z, w] vector
 
+def get_angular(point):
+    m = 2.6 # TODO get actual value 
+    g = 9.81
+    z_W = np.array([[0, 0, 1]]).T 
+    x_B, y_B, z_B = get_drone_frame(point)
+    jerk = np.array([[point.j.x, point.j.y, point.j.z]]).T 
+    dpsi = point.dpsi
+
+    # Compute u1 
+    f_des = m * g * z_W + m * np.array([[point.a.x, point.a.y, point.a.z]]).T
+    u1 = (f_des.T @ z_B)[0, 0]
+
+    # Compute h_om
+    h_om = m / u1 * (jerk - (z_B.T @ jerk)[0, 0] * z_B)
+
+    # Compute angular velocities 
+    p = - (h_om.T @ y_B)[0, 0]
+    q = (h_om.T @ x_B)[0, 0]
+    r = dpsi * (z_W.T @ z_B)[0, 0] 
+
+    return p, q, r
 
 def yaw_to_quaternion(yaw):
     qx = 0.0
