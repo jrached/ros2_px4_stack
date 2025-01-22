@@ -7,7 +7,10 @@ import os
 
 def generate_launch_description():
     namespace = LaunchConfiguration("ns")
+    init_x, init_y, init_z = os.environ.get("INIT_X"), os.environ.get("INIT_Y"), os.environ.get("INIT_Z")
+    init_roll, init_pitch, init_yaw = os.environ.get("INIT_ROLL"), os.environ.get("INIT_PITCH"), os.environ.get("INIT_YAW")
     veh = os.environ.get("VEH_NAME")
+
     return LaunchDescription([
         # Declare launch arguments
         DeclareLaunchArgument('argname', default_value='val'),
@@ -16,36 +19,34 @@ def generate_launch_description():
         DeclareLaunchArgument('ns', default_value=EnvironmentVariable("VEH_NAME")),
         DeclareLaunchArgument('fcu_url', default_value='/dev/ttyACM0:921600'),
         DeclareLaunchArgument('respawn_mavros', default_value='false'),
+        
+        # Run dynus node
         Node(
             package='ros2_px4_stack',
             executable='track_dynus_traj',
             name='track_dynus_traj_py',
+            namespace=namespace,
             output='screen',
         ),
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            name='odom_to_mavros',
-            arguments=['0', '0', '0', '-1.57', '3.14', '0', 'odom', 'world_mavros']
-        ),
+
+        # Static transforms
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
             name='odom_to_mocap',
-            arguments=['-4.5', '0.0', '0.3', '0.0', '0', '0', 'world_mocap', 'odom'], # podium initial pos (for dynus testing) TODO: Change to initial pose
-            # arguments=['1.457', '-3.192', '1.314', '1.576', '0', '0', 'world_mocap', 'odom'] #table close to the control room TODO: Change to initial pose #Usual initial pose
+            arguments=[init_x, init_y, init_z, init_yaw, init_pitch, init_roll, 'world_mocap', f'{veh}/init_pose'] 
         ),
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
             name='map_to_odom',
-            arguments=['0', '0', '0', '0', '0', '0', 'odom', 'map']
+            arguments=['0', '0', '0', '0', '0', '0', 'world', 'world_mocap']
         ),
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
-            name='base_link_to_ns',
-            arguments=['0', '0', '0', '0', '0', '0', f"/{veh}/base_link", '/base_link'] #TODO: Change BD01 to namespace or smth
+            name='map_to_odom',
+            arguments=['0', '0', '0', '0', '0', '0', 'world', 'map']
         ),
         Node(
             package='tf2_ros',
@@ -54,7 +55,7 @@ def generate_launch_description():
             arguments=['0', '0', '0', '0', '0', '0', f"{veh}/base_link", f"{veh}/d455_link"]
         ),
 
-        # Launch the repub_mocap node
+        # Run repub_livox node
         Node(
             package='ros2_px4_stack',
             executable='repub_livox',
@@ -62,4 +63,13 @@ def generate_launch_description():
             namespace=namespace,
             output='screen',
         ),
+
+        # Run mocap to livox command frame conversion
+        Node(
+            package='ros2_px4_stack', 
+            executable='mocap_to_livox_frame',
+            name='mocap_to_livox_frame',
+            namespace=namespace,
+            output='screen', 
+        )
     ])

@@ -7,6 +7,8 @@ import os
 
 def generate_launch_description():
     namespace = LaunchConfiguration("ns")
+    init_x, init_y, init_z = os.environ.get("INIT_X"), os.environ.get("INIT_Y"), os.environ.get("INIT_Z")
+    init_roll, init_pitch, init_yaw = os.environ.get("INIT_ROLL"), os.environ.get("INIT_PITCH"), os.environ.get("INIT_YAW")
     veh = os.environ.get("VEH_NAME")
     return LaunchDescription([
         # Declare launch arguments
@@ -23,30 +25,30 @@ def generate_launch_description():
             output='screen',
         ),
         # Static transform publishers
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            name='odom_to_mavros',
-            arguments=['0', '0', '0', '-1.57', '3.14', '0', 'odom', 'world_mavros']
-        ),
+        # Node(
+        #     package='tf2_ros',
+        #     executable='static_transform_publisher',
+        #     name='odom_to_mavros',
+        #     arguments=['0', '0', '0', '-1.57', '3.14', '0', 'odom', 'world_mavros']
+        # ),
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
             name='odom_to_mocap',
-            arguments=['1.457', '-3.192', '1.314', '1.576', '0', '0', 'world_mocap', 'odom'] #TODO: Change to initial conditions 
+            arguments=[init_x, init_y, init_z, init_yaw, init_pitch, init_roll, 'world_mocap', f'{veh}/init_pose'] 
         ),
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            name='map_to_odom',
-            arguments=['0', '0', '0', '0', '0', '0', 'odom', 'map']
-        ),
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            name='base_link_to_ns',
-            arguments=['0', '0', '0', '0', '0', '0', f"/{veh}/base_link", '/base_link'] #TODO: Change BD01 to namespace or smth
-        ),
+        # Node(
+        #     package='tf2_ros',
+        #     executable='static_transform_publisher',
+        #     name='map_to_odom',
+        #     arguments=['0', '0', '0', '0', '0', '0', 'odom', 'map']
+        # ),
+        # Node(
+        #     package='tf2_ros',
+        #     executable='static_transform_publisher',
+        #     name='base_link_to_ns',
+        #     arguments=['0', '0', '0', '0', '0', '0', f"/{veh}/base_link", '/base_link'] 
+        # ),
         Node(
             package='ros2_px4_stack',
             executable='repub_livox',
