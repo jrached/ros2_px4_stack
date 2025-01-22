@@ -137,7 +137,8 @@ class OffboardDynusFollower(BasicMavrosInterface):
         )
 
         quat = get_orientation(point)
-        self.get_logger().info(f"Computed Quaternion: {quat}")
+        p, q, r = get_angular(point)
+        self.get_logger().info(f"Angular Velocity: {p}, {q}, {r}")
 
         trajectory_points = [MultiDOFJointTrajectoryPoint(
             transforms=[Transform(
