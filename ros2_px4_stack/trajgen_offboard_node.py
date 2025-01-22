@@ -136,6 +136,8 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
         )
 
         quat = get_orientation(point)
+        p, q, r = get_angular(point) 
+        self.get_logger().info(f"angular velocity: {p}, {q}, {r}")
 
         trajectory_points = [MultiDOFJointTrajectoryPoint(
             transforms=[Transform(
@@ -158,9 +160,9 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
                     z=point.v.z
                 ),
                 angular=Vector3(
-                    x=0.0,
-                    y=0.0,
-                    z=point.dpsi
+                    x=p,
+                    y=q,
+                    z=r
                 )
             )],
             accelerations=[Twist(
@@ -241,9 +243,9 @@ def get_angular(point):
     h_om = m / u1 * (jerk - (z_B.T @ jerk)[0, 0] * z_B)
 
     # Compute angular velocities 
-    p = - (h_om.T @ y_B)[0, 0]
-    q = (h_om.T @ x_B)[0, 0]
-    r = dpsi * (z_W.T @ z_B)[0, 0] 
+    p = float(- (h_om.T @ y_B)[0, 0])
+    q = float((h_om.T @ x_B)[0, 0])
+    r = float(dpsi * (z_W.T @ z_B)[0, 0]) 
 
     return p, q, r
 
