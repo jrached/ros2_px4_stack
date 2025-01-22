@@ -16,6 +16,7 @@ from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, Transform, T
 from dynus_interfaces.msg import Goal
 from dynus_interfaces.msg import State as StateDynus
 from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
+from scipy.spatial.transform import Rotation
 
 from std_msgs.msg import Header
 from mavros import mavlink
@@ -134,6 +135,9 @@ class OffboardDynusFollower(BasicMavrosInterface):
             f"Only local navigation is supported for this method"
         )
 
+        quat = get_orientation(point)
+        self.get_logger().info(f"Computed Quaternion: {quat}")
+
         trajectory_points = [MultiDOFJointTrajectoryPoint(
             transforms=[Transform(
                 translation=Vector3(
@@ -142,10 +146,10 @@ class OffboardDynusFollower(BasicMavrosInterface):
                     z=point.p.z,
                 ),
                 rotation=Quaternion(
-                    x=yaw_to_quaternion(point.yaw)[0],
-                    y=yaw_to_quaternion(point.yaw)[1],
-                    z=yaw_to_quaternion(point.yaw)[2],
-                    w=yaw_to_quaternion(point.yaw)[3]
+                    x=quat[0],
+                    y=quat[1],
+                    z=quat[2],
+                    w=quat[3]
                 )
             )],
             velocities=[Twist(
@@ -227,6 +231,30 @@ def yaw_to_quaternion(yaw):
     qw = math.cos(yaw / 2.0)
 
     return [qx, qy, qz, qw]
+
+
+def get_orientation(point):
+    g = 9.81
+
+    # Construct differentially flat vectors 
+    sigma = np.array([[point.p.x, point.p.y, point.p.z, point.psi]]).T
+    sigma_dot_dot = np.array([[point.a.x, point.a.y, point.a.z, 0]]).T
+
+    # Compute z_B 
+    t = np.array([[sigma_dot_dot[0][0], sigma_dot_dot[1][0], sigma_dot_dot[2][0] + g]]).T
+    z_B = t / np.linalg.norm(t) 
+
+    # Compute intermediate yaw vector x_C
+    x_C = np.array([[np.cos(sigma[3][0]), np.sin(sigma[3][0]), 0]]).T
+
+    # Compute x--axis and y-axis of drone frame measured in world frame
+    cross_prod = np.cross(z_B.T[0], x_C.T[0]) 
+    y_B = np.array([cross_prod / np.linalg.norm(cross_prod)]).T 
+    x_B = np.array([np.cross(y_B.T[0], z_B.T[0])]).T 
+
+    # Compute populate rotation matrix of drone frame measured from world frame
+    R_W_B = np.hstack((x_B, y_B, z_B))
+    return Rotation.from_matrix(R_W_B).as_quat() # As [x, y, z, w] vector
 
 
 def main():
