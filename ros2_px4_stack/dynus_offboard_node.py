@@ -17,6 +17,7 @@ from dynus_interfaces.msg import Goal
 from dynus_interfaces.msg import State as StateDynus
 from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
 from scipy.spatial.transform import Rotation
+import numpy as np
 
 from std_msgs.msg import Header
 from mavros import mavlink
@@ -237,7 +238,7 @@ def get_orientation(point):
     g = 9.81
 
     # Construct differentially flat vectors 
-    sigma = np.array([[point.p.x, point.p.y, point.p.z, point.psi]]).T
+    sigma = np.array([[point.p.x, point.p.y, point.p.z, point.yaw]]).T
     sigma_dot_dot = np.array([[point.a.x, point.a.y, point.a.z, 0]]).T
 
     # Compute z_B 
