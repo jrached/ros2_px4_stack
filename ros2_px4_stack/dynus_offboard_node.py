@@ -161,9 +161,9 @@ class OffboardDynusFollower(BasicMavrosInterface):
                     z=point.v.z
                 ),
                 angular=Vector3(
-                    x=0.0,
-                    y=0.0,
-                    z=point.dyaw
+                    x=p,
+                    y=q,
+                    z=r
                 )
             )],
             accelerations=[Twist(
