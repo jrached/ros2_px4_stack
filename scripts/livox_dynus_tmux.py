@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
         f"source ~/code/dynus_ws/install/setup.bash && source ~/code/mavros_ws/install/setup.bash && ./home/swarm/code/get_init_pose.sh && sleep 10 && ros2 launch ros2_px4_stack dynus_mavros.launch.py", # Pane 8
 
-        f"sleep 30.0 && cd bags && cd test && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/odom {veh}/mavros/setpoint_trajectory/local", # Pane 9
+        f"sleep 30.0 && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/odom {veh}/mavros/setpoint_trajectory/local", # Pane 9
         
     ]
     run_tmux_commands(session_name, commands)
