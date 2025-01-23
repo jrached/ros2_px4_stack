@@ -15,7 +15,7 @@ def run_tmux_commands(session_name, commands):
         # Start a new TMUX session
         subprocess.run(["tmux", "new-session", "-d", "-s", session_name], check=True)
 
-        # Split the terminal into a 2x2 grid
+        # Split the terminal into a 3x3 grid
         subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0"], check=True)  # Split horizontally
         subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.0"], check=True)  # Split top vertically
         subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.1"], check=True)  # Split bottom vertically
@@ -48,15 +48,28 @@ if __name__ == "__main__":
     mav_id = os.environ.get("MAV_SYS_ID")
     session_name = f"{veh}_tmux_session"
     commands = [
-        f"ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}",  # Command for pane 1
-        "ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for pane 2
-        "ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
-        "ros2 launch ros2_px4_stack offboard_gen_traj.launch.py",  # Command for pane 4,
-        "echo Nothing to see here", # Pane 5
-        f"sleep 10.0 && cd ~/code/data/mocap && rm -rf rosbag* && ros2 bag record /SQ01/goal {veh}/mavros/local_position/odom /{veh}/world /{veh}/mocap/twist", # Pane 6
-        f"ros2 topic echo {veh}/mavros/local_position/pose", # Pane 7
-        f"ros2 topic echo /{veh}/world", # Pane  8
-        "ros2 topic echo /SQ01/goal", # Pane 9
+        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/decomp_ws/install/setup.bash && sleep 10 && ros2 launch dynus onboard_dynus.launch.py x:=0.0 y:=0.0 z:=0.0 yaw:=0 namespace:={veh} use_obstacle_tracker:=false use_ground_robot:=false use_hardware:=true " \
+        "use_onboard_localization:=true depth_camera_name:=d455",  # Command for pane 1
+
+        "echo 'not using d455'", # Pane 2
+
+        f"source ~/code/livox_ws/install/setup.bash && sleep 10 && ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 3
+
+        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/dlio_ws/install/setup.bash && sleep 10 && ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 4
+
+        f"ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}", # Pane 5
+
+        f"sleep 15.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 6
+
+        f"sleep 15.0 && ros2 topic echo /{veh}/dlio/odom_node/pose", # Pane  7
+
+        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/mavros_ws/install/setup.bash && ./home/swarm/code/get_init_pose.sh && sleep 10 && ros2 launch ros2_px4_stack dynus_mavros.launch.py", # Pane 8
+
+        f"sleep 30.0 && cd bags && cd test && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/odom {veh}/mavros/setpoint_trajectory/local", # Pane 9
+        
     ]
     run_tmux_commands(session_name, commands)
+
+
+
 

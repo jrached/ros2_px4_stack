@@ -59,3 +59,5 @@ if __name__ == "__main__":
         f"sleep 10.0 && ros2 topic echo /{veh}/dlio/odom_node/pose", # Pane  9
     ]
     run_tmux_commands(session_name, commands)
+
+    
