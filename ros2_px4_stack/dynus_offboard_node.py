@@ -91,7 +91,7 @@ class OffboardDynusFollower(BasicMavrosInterface):
         self.received_trajectory_setpoint = msg
 
     def _publish_trajectory_setpoint(self):
-        rate = 50 #Hz
+        rate = 100 #Hz
         rate = self.create_rate(rate)
         while rclpy.ok():
             if (

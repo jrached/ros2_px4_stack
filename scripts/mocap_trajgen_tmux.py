@@ -49,14 +49,14 @@ if __name__ == "__main__":
     session_name = f"{veh}_tmux_session"
     commands = [
         f"ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}",  # Command for pane 1
-        "source ~/code/trajgen_ws && ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for pane 2
-        "source ~/code/trajgen_ws && ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
-        "source ~/code/mavros_ws && ros2 launch ros2_px4_stack offboard_gen_traj.launch.py",  # Command for pane 4,
+        "source ~/code/trajgen_ws/install/setup.bash && ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for pane 2
+        "source ~/code/trajgen_ws/install/setup.bash && ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
+        "source ~/code/trajgen_ws/install/setup.bash && ros2 launch ros2_px4_stack offboard_gen_traj.launch.py",  # Command for pane 4,
         "echo Nothing to see here", # Pane 5
-        f"sleep 10.0 && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record /SQ01/goal {veh}/mavros/local_position/odom /{veh}/world /{veh}/mocap/twist", # Pane 6
+        f"source ~/code/trajgen_ws/install/setup.bash && sleep 10.0 && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/setpoint_trajectory/local {veh}/mavros/local_position/odom /{veh}/world /{veh}/mocap/twist", # Pane 6
         f"ros2 topic echo {veh}/mavros/local_position/pose", # Pane 7
         f"ros2 topic echo /{veh}/world", # Pane  8
-        "ros2 topic echo /SQ01/goal", # Pane 9
+        "source ~/code/trajgen_ws/install/setup.bash && ros2 topic echo /SQ01/goal", # Pane 9
     ]
     run_tmux_commands(session_name, commands)
 
