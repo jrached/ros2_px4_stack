@@ -188,12 +188,13 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
 
 
     def track_trajectory(self):
-        # wait 1 second for FCU connection
+        # wait 1 second for FCU connection 
         self.wait_for_seconds(1)
         while rclpy.ok():
             if self.received_trajectory_setpoint != None:
                 self.trajectory_setpoint = self._pack_into_traj_gen(self.received_trajectory_setpoint)
-                self.wait_for_seconds(0.2)
+                seconds = 1 / 100 # Updates at 100 Hz
+                self.wait_for_seconds(seconds)
 
     
 ########################
