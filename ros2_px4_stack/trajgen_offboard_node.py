@@ -138,6 +138,7 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
         quat = get_orientation(point)
         p, q, r = get_angular(point) 
         # self.get_logger().info(f"angular velocity: {p}, {q}, {r}")
+        # self.get_logger().info(f"orientation: {[quat[0], quat[1], quat[2], quat[3]]}")
 
         trajectory_points = [MultiDOFJointTrajectoryPoint(
             transforms=[Transform(
@@ -228,7 +229,7 @@ def get_orientation(point):
     return Rotation.from_matrix(R_W_B).as_quat() # As [x, y, z, w] vector
 
 def get_angular(point):
-    m = 2.6 # TODO get actual value 
+    m = 2.744 # TODO get actual value 
     g = 9.81
     z_W = np.array([[0, 0, 1]]).T 
     x_B, y_B, z_B = get_drone_frame(point)
