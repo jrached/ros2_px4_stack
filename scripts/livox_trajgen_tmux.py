@@ -1,5 +1,6 @@
 #!/bin/usr/env python3
 
+#TODO Write node to change livox pose from mocap frame to agent frame before trajgen runs so that trajgen plans in agent frame. 
 import subprocess
 import os 
 
@@ -51,7 +52,7 @@ if __name__ == "__main__":
         f"ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}",  # Command for pane 1
         "source ~/code/trajgen_ws/install/setup.bash && ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for pane 2
         "source ~/code/trajgen_ws/install/setup.bash && ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
-        "source ~/code/trajgen_ws/install/setup.bash && source ~/code/mavros_ws/install/setup.bash && ./home/swarm/code/get_init_pose.sh && ros2 launch ros2_px4_stack livox_gen_traj.launch.py",  # Command for pane 4,
+        "source ~/code/trajgen_ws/install/setup.bash && source ~/code/mavros_ws/install/setup.bash && source ~/code/get_init_pose.sh && ros2 launch ros2_px4_stack livox_gen_traj.launch.py",  # Command for pane 4,
         f"ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 5
         f"ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 6
         f"sleep 10.0 && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record /SQ01/goal {veh}/mavros/local_position/pose {veh}/mavros/local_position/velocity_local /{veh}/dlio/odom_node/pose", # Pane 7

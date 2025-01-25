@@ -23,8 +23,8 @@ def generate_launch_description():
         # Run dynus node
         Node(
             package='ros2_px4_stack',
-            executable='track_dynus_traj',
-            name='track_dynus_traj_py',
+            executable='dynus_offboard_node',
+            name='dynus_offboard_node_py',
             namespace=namespace,
             output='screen',
         ),

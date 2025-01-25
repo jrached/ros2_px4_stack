@@ -47,6 +47,10 @@ class BasicMavrosInterface(Node):
         qos_profile.durability = DurabilityPolicy.VOLATILE
         qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
 
+        qos_profile2 = QoSProfile(depth=10)
+        qos_profile2.durability = DurabilityPolicy.VOLATILE
+        qos_profile2.reliability = ReliabilityPolicy.RELIABLE
+
         self.state = State()
         self.altitude = Altitude()
         self.extended_state = ExtendedState()
@@ -150,7 +154,7 @@ class BasicMavrosInterface(Node):
         )
         self.setpoint_traj_pub = self.create_publisher(MultiDOFJointTrajectory, 
         "mavros/setpoint_trajectory/local", 
-        qos_profile
+        10
         )
 
         # need to simulate heartbeat to prevent datalink loss detection

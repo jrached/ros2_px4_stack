@@ -28,7 +28,7 @@ def run_tmux_commands(session_name, commands):
         # Commands to run in each pane
         for i, cmd in enumerate(commands):
             # Construct the full command with setup steps
-            full_command = f"cd ~/code/mavros_ws && source install/setup.bash && {cmd}"
+            full_command = f"source ~/code/mavros_ws/install/setup.bash && {cmd}"
             # Send the command to the corresponding pane
             subprocess.run(["tmux", "send-keys", "-t", f"{session_name}:0.{i}", full_command, "C-m"], check=True)
 
@@ -63,9 +63,9 @@ if __name__ == "__main__":
 
         f"sleep 15.0 && ros2 topic echo /{veh}/dlio/odom_node/pose", # Pane  7
 
-        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/mavros_ws/install/setup.bash && ./home/swarm/code/get_init_pose.sh && sleep 10 && ros2 launch ros2_px4_stack dynus_mavros.launch.py", # Pane 8
+        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/get_init_pose.sh && sleep 10 && ros2 launch ros2_px4_stack dynus_mavros.launch.py", # Pane 8
 
-        f"sleep 30.0 && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/odom {veh}/mavros/setpoint_trajectory/local", # Pane 9
+        f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/odom {veh}/mavros/setpoint_trajectory/local {veh}/dlio/odom_node/odom {veh}/goal", # Pane 9
         
     ]
     run_tmux_commands(session_name, commands)

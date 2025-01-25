@@ -68,15 +68,20 @@ class OffboardDynusFollower(BasicMavrosInterface):
         self.trajectory_setpoint = None
         self.received_trajectory_setpoint = None
 
+        # TEMP
+        self.flight_state = "TAKEOFF"
+        self.dynus_running = False 
+        self.alt_ = 1.0
+
         # Dynus subscriptions/publishers 
         veh = os.environ.get("VEH_NAME")
         self.dynus_goal_topic = f'/{veh}/goal'
-        self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, qos_profile)
+        # self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, qos_profile)
+        self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, 1)
         
         # Start thread for trajectory publisher 
         self.trajectory_publish_thread = Thread(
-            target=self._publish_trajectory_setpoint, args=()
-        )
+            target=self._publish_trajectory_setpoint)
         self.trajectory_publish_thread.daemon = True
         self.trajectory_publish_thread.start() 
 
@@ -90,15 +95,46 @@ class OffboardDynusFollower(BasicMavrosInterface):
     def dynus_cb(self, msg):
         self.received_trajectory_setpoint = msg
 
+        if self.trajectory_setpoint is not None: 
+            self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
+            self.setpoint_traj_pub.publish(self.trajectory_setpoint)
+
+        if not self.dynus_running: 
+            self.dynus_running = True 
+
+
     def _publish_trajectory_setpoint(self):
         rate = 100 #Hz
         rate = self.create_rate(rate)
+
+        takeoff_pos = self.point_to_traj([self.local_position.pose.position.x, self.local_position.pose.position.y, self.alt_])
+
         while rclpy.ok():
+            if self.flight_state == "TAKEOFF":
+                self.get_logger().info("Taking Off")
+
+                self.trajectory_setpoint = takeoff_pos
+
+                if (self.traj_point_reached(takeoff_pos)
+                    and self.received_trajectory_setpoint is not None):
+                    self.get_logger().info("Takeoff Complete")
+                    self.get_logger().info("Following Trajectory")
+                    self.flight_state = "TRAJECTORY"
+                    init_pos = takeoff_pos
+
+            elif self.flight_state == "TRAJECTORY":
+                if self.received_trajectory_setpoint is not None:
+                    self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
+
             if (
-                self.navigation_mode == LOCAL_NAVIGATION
-                and self.trajectory_setpoint is not None
+                self.navigation_mode == LOCAL_NAVIGATION and 
+                not self.dynus_running and 
+                self.trajectory_setpoint is not None
             ):
                 self.setpoint_traj_pub.publish(self.trajectory_setpoint)
+            elif self.dynus_running:
+                break 
+            
             rate.sleep()
 
     def point_to_traj(self, point: List):
@@ -124,14 +160,15 @@ class OffboardDynusFollower(BasicMavrosInterface):
         """
         Converts a dynus trajectory into a mavros trajectory point by point. 
         """
-        assert self.navigation_mode == LOCAL_NAVIGATION, (
-            f"Invalid navigation mode: {self.navigation_mode}."
-            f"Only local navigation is supported for this method"
-        )
+        # assert self.navigation_mode == LOCAL_NAVIGATION, (
+        #     f"Invalid navigation mode: {self.navigation_mode}."
+        #     f"Only local navigation is supported for this method"
+        # )
 
         quat = get_orientation(point)
         p, q, r = get_angular(point)
-
+        # quat = yaw_to_quaternion(point.yaw)
+        
         trajectory_points = [MultiDOFJointTrajectoryPoint(
             transforms=[Transform(
                 translation=Vector3(
@@ -157,6 +194,11 @@ class OffboardDynusFollower(BasicMavrosInterface):
                     y=q,
                     z=r
                 )
+                # angular=Vector3(
+                #     x=0.0,
+                #     y=0.0,
+                #     z=point.dyaw
+                # )
             )],
             accelerations=[Twist(
                 linear=Vector3(
@@ -178,42 +220,35 @@ class OffboardDynusFollower(BasicMavrosInterface):
 
         return trajectory_msg
 
-    def takeoff_and_track_trajectory(self, altitude):
-
+    def takeoff_and_track_trajectory(self, altitude): 
         # wait 1 second for FCU connection
-        self.wait_for_seconds(1)
+        pass
+        # self.wait_for_seconds(1)
 
-        flight_state = "TAKEOFF"
-        takeoff_pos = self.point_to_traj([self.local_position.pose.position.x, self.local_position.pose.position.y, altitude])
+        # # takeoff_pos = self.point_to_traj([self.local_position.pose.position.x, self.local_position.pose.position.y, altitude])
 
-        while rclpy.ok():
-            if flight_state == "TAKEOFF":
-                self.get_logger().info("Taking Off")
+        # # while rclpy.ok():
+        # #     if self.flight_state == "TAKEOFF":
+        # #         self.get_logger().info("Taking Off")
 
-                self.trajectory_setpoint = takeoff_pos
+        # #         self.trajectory_setpoint = takeoff_pos
+        # #         self.setpoint_traj_pub.publish(self.trajectory_setpoint)
 
-                if (self.traj_point_reached(takeoff_pos)
-                    and self.received_trajectory_setpoint is not None):
-                    self.get_logger().info("Takeoff Complete")
-                    flight_state = "TRAJECTORY"
-                    init_pos = takeoff_pos
+        # #         if (self.traj_point_reached(takeoff_pos)
+        # #             and self.received_trajectory_setpoint is not None):
+        # #             self.get_logger().info("Takeoff Complete")
+        # #             self.get_logger().info("Following Trajectory")
+        # #             self.flight_state = "TRAJECTORY"
+        # #             init_pos = takeoff_pos
 
-            elif flight_state == "TRAJECTORY":
-                self.get_logger().info("Following Trajectory")
-                if self.received_trajectory_setpoint:
-                    self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
+        # #     elif self.flight_state == "TRAJECTORY":
+        # #         if self.received_trajectory_setpoint is not None:
+        # #             self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
+        # #         break # TODO Delete
 
-                # If trajectory is over 
-                if (self.count_publishers(self.dynus_goal_topic) == 0):
-                    self.get_logger().info("Returning to Initial Position")
-                    flight_state = "RETURN"
-            
-            elif flight_state == "RETURN":
-                self.trajectory_setpoint = init_pos
-
-            seconds = 1 / 100 # Update at 100 Hz 
-            self.wait_for_seconds(seconds)
-
+        #     seconds = 1 / 100 # Update at 100 Hz 
+        #     self.wait_for_seconds(seconds)
+        
 
 ########################
 ### Helper Functions ###

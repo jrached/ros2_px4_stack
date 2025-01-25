@@ -56,13 +56,13 @@ class SmoothTrajectoryTracker(OffboardDynusFollower):
         qos_profile.durability = DurabilityPolicy.VOLATILE
         qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
 
-    def track_trajectory(self, altitude = 0.5):
+    def track_trajectory(self, altitude = 1.0):
         self.takeoff_and_track_trajectory(altitude)
 
 def main(args=None):
     rclpy.init(args=args)
     traj_tracker = SmoothTrajectoryTracker()
-    traj_tracker.track_trajectory(altitude = 0.5)
+    traj_tracker.track_trajectory(altitude = 1.0)
 
 if __name__ == '__main__':
     main()
