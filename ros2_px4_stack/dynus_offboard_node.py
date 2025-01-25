@@ -67,45 +67,35 @@ class OffboardDynusFollower(BasicMavrosInterface):
 
         self.trajectory_setpoint = None
         self.received_trajectory_setpoint = None
-
-        # TEMP
         self.flight_state = "TAKEOFF"
-        self.dynus_running = False 
         self.alt_ = 1.0
+
+        # Vehicle dynamics
+        self.m = 2.744
+        self.g = 9.81
 
         # Dynus subscriptions/publishers 
         veh = os.environ.get("VEH_NAME")
         self.dynus_goal_topic = f'/{veh}/goal'
-        # self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, qos_profile)
-        self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, 1)
+        self.dynus_traj_sub = self.create_subscription(Goal, self.dynus_goal_topic, self.dynus_cb, qos_profile)
         
         # Start thread for trajectory publisher 
         self.trajectory_publish_thread = Thread(
-            target=self._publish_trajectory_setpoint)
+            target=self.takeoff_cb)
         self.trajectory_publish_thread.daemon = True
         self.trajectory_publish_thread.start() 
 
 
-    # Method to wait for FCU connection 
-    def wait_for_seconds(self, seconds):
-        start_time = self.get_clock().now()
-        while (self.get_clock().now() - start_time).nanoseconds < seconds * 1e9:
-            rclpy.spin_once(self)
-
     def dynus_cb(self, msg):
         self.received_trajectory_setpoint = msg
 
-        if self.trajectory_setpoint is not None: 
+        if self.flight_state == "TRAJECTORY" and self.navigation_mode == LOCAL_NAVIGATION: 
             self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
             self.setpoint_traj_pub.publish(self.trajectory_setpoint)
 
-        if not self.dynus_running: 
-            self.dynus_running = True 
-
-
-    def _publish_trajectory_setpoint(self):
-        rate = 100 #Hz
-        rate = self.create_rate(rate)
+    def takeoff_cb(self):
+        freq = 100 #Hz
+        rate = self.create_rate(freq)
 
         takeoff_pos = self.point_to_traj([self.local_position.pose.position.x, self.local_position.pose.position.y, self.alt_])
 
@@ -113,27 +103,16 @@ class OffboardDynusFollower(BasicMavrosInterface):
             if self.flight_state == "TAKEOFF":
                 self.get_logger().info("Taking Off")
 
-                self.trajectory_setpoint = takeoff_pos
+                if self.navigation_mode == LOCAL_NAVIGATION:
+                    self.setpoint_traj_pub.publish(takeoff_pos)
 
                 if (self.traj_point_reached(takeoff_pos)
                     and self.received_trajectory_setpoint is not None):
-                    self.get_logger().info("Takeoff Complete")
-                    self.get_logger().info("Following Trajectory")
+                    self.get_logger().info("Takeoff Complete. Following Trajectory.")
                     self.flight_state = "TRAJECTORY"
-                    init_pos = takeoff_pos
 
             elif self.flight_state == "TRAJECTORY":
-                if self.received_trajectory_setpoint is not None:
-                    self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
-
-            if (
-                self.navigation_mode == LOCAL_NAVIGATION and 
-                not self.dynus_running and 
-                self.trajectory_setpoint is not None
-            ):
-                self.setpoint_traj_pub.publish(self.trajectory_setpoint)
-            elif self.dynus_running:
-                break 
+                break
             
             rate.sleep()
 
@@ -160,15 +139,14 @@ class OffboardDynusFollower(BasicMavrosInterface):
         """
         Converts a dynus trajectory into a mavros trajectory point by point. 
         """
-        # assert self.navigation_mode == LOCAL_NAVIGATION, (
-        #     f"Invalid navigation mode: {self.navigation_mode}."
-        #     f"Only local navigation is supported for this method"
-        # )
+        assert self.navigation_mode == LOCAL_NAVIGATION, (
+            f"Invalid navigation mode: {self.navigation_mode}."
+            f"Only local navigation is supported for this method"
+        )
 
-        quat = get_orientation(point)
-        p, q, r = get_angular(point)
-        # quat = yaw_to_quaternion(point.yaw)
-        
+        quat = self.get_orientation(point)
+        p, q, r = self.get_angular(point)
+
         trajectory_points = [MultiDOFJointTrajectoryPoint(
             transforms=[Transform(
                 translation=Vector3(
@@ -194,11 +172,6 @@ class OffboardDynusFollower(BasicMavrosInterface):
                     y=q,
                     z=r
                 )
-                # angular=Vector3(
-                #     x=0.0,
-                #     y=0.0,
-                #     z=point.dyaw
-                # )
             )],
             accelerations=[Twist(
                 linear=Vector3(
@@ -220,40 +193,57 @@ class OffboardDynusFollower(BasicMavrosInterface):
 
         return trajectory_msg
 
-    def takeoff_and_track_trajectory(self, altitude): 
-        # wait 1 second for FCU connection
-        pass
-        # self.wait_for_seconds(1)
+    def get_drone_frame(self, point):
+        # Construct differentially flat vectors 
+        sigma = np.array([[point.p.x, point.p.y, point.p.z, point.yaw]]).T
+        sigma_dot_dot = np.array([[point.a.x, point.a.y, point.a.z, 0]]).T
 
-        # # takeoff_pos = self.point_to_traj([self.local_position.pose.position.x, self.local_position.pose.position.y, altitude])
+        # Compute z_B 
+        t = np.array([[sigma_dot_dot[0][0], sigma_dot_dot[1][0], sigma_dot_dot[2][0] + self.g]]).T
+        z_B = t / np.linalg.norm(t) 
 
-        # # while rclpy.ok():
-        # #     if self.flight_state == "TAKEOFF":
-        # #         self.get_logger().info("Taking Off")
+        # Compute intermediate yaw vector x_C
+        x_C = np.array([[np.cos(sigma[3][0]), np.sin(sigma[3][0]), 0]]).T
 
-        # #         self.trajectory_setpoint = takeoff_pos
-        # #         self.setpoint_traj_pub.publish(self.trajectory_setpoint)
+        # Compute x-axis and y-axis of drone frame measured in world frame
+        cross_prod = np.cross(z_B.T[0], x_C.T[0]) 
+        y_B = np.array([cross_prod / np.linalg.norm(cross_prod)]).T 
+        x_B = np.array([np.cross(y_B.T[0], z_B.T[0])]).T 
 
-        # #         if (self.traj_point_reached(takeoff_pos)
-        # #             and self.received_trajectory_setpoint is not None):
-        # #             self.get_logger().info("Takeoff Complete")
-        # #             self.get_logger().info("Following Trajectory")
-        # #             self.flight_state = "TRAJECTORY"
-        # #             init_pos = takeoff_pos
+        return x_B, y_B, z_B 
 
-        # #     elif self.flight_state == "TRAJECTORY":
-        # #         if self.received_trajectory_setpoint is not None:
-        # #             self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
-        # #         break # TODO Delete
+    def get_orientation(self, point):
+        x_B, y_B, z_B = self.get_drone_frame(point)
 
-        #     seconds = 1 / 100 # Update at 100 Hz 
-        #     self.wait_for_seconds(seconds)
-        
+        # Populate rotation matrix of drone frame measured from world frame
+        R_W_B = np.hstack((x_B, y_B, z_B))
+
+        return Rotation.from_matrix(R_W_B).as_quat() # As [x, y, z, w] vector
+
+    def get_angular(self, point): 
+        z_W = np.array([[0, 0, 1]]).T 
+        x_B, y_B, z_B = self.get_drone_frame(point)
+        jerk = np.array([[point.j.x, point.j.y, point.j.z]]).T 
+        dpsi = point.dyaw 
+
+        # Compute u1 
+        f_des = self.m * self.g * z_W + self.m * np.array([[point.a.x, point.a.y, point.a.z]]).T
+        u1 = (f_des.T @ z_B)[0, 0]
+
+        # Compute h_om
+        h_om = self.m / u1 * (jerk - (z_B.T @ jerk)[0, 0] * z_B)
+
+        # Compute angular velocities 
+        p = float(-(h_om.T @ y_B)[0, 0])
+        q = float((h_om.T @ x_B)[0, 0])
+        r = float(dpsi * (z_W.T @ z_B)[0, 0]) 
+
+        return p, q, r
+
 
 ########################
 ### Helper Functions ###
 ########################
-
 def yaw_to_quaternion(yaw):
     qx = 0.0
     qy = 0.0
@@ -261,58 +251,6 @@ def yaw_to_quaternion(yaw):
     qw = math.cos(yaw / 2.0)
 
     return [qx, qy, qz, qw]
-
-def get_drone_frame(point):
-    g = 9.81
-
-    # Construct differentially flat vectors 
-    sigma = np.array([[point.p.x, point.p.y, point.p.z, point.yaw]]).T
-    sigma_dot_dot = np.array([[point.a.x, point.a.y, point.a.z, 0]]).T
-
-    # Compute z_B 
-    t = np.array([[sigma_dot_dot[0][0], sigma_dot_dot[1][0], sigma_dot_dot[2][0] + g]]).T
-    z_B = t / np.linalg.norm(t) 
-
-    # Compute intermediate yaw vector x_C
-    x_C = np.array([[np.cos(sigma[3][0]), np.sin(sigma[3][0]), 0]]).T
-
-    # Compute x-axis and y-axis of drone frame measured in world frame
-    cross_prod = np.cross(z_B.T[0], x_C.T[0]) 
-    y_B = np.array([cross_prod / np.linalg.norm(cross_prod)]).T 
-    x_B = np.array([np.cross(y_B.T[0], z_B.T[0])]).T 
-
-    return x_B, y_B, z_B 
-
-def get_orientation(point):
-    x_B, y_B, z_B = get_drone_frame(point)
-
-    # Populate rotation matrix of drone frame measured from world frame
-    R_W_B = np.hstack((x_B, y_B, z_B))
-
-    return Rotation.from_matrix(R_W_B).as_quat() # As [x, y, z, w] vector
-
-def get_angular(point):
-    m = 2.744 
-    g = 9.81
-    z_W = np.array([[0, 0, 1]]).T 
-    x_B, y_B, z_B = get_drone_frame(point)
-    jerk = np.array([[point.j.x, point.j.y, point.j.z]]).T 
-    dpsi = point.dyaw 
-
-    # Compute u1 
-    f_des = m * g * z_W + m * np.array([[point.a.x, point.a.y, point.a.z]]).T
-    u1 = (f_des.T @ z_B)[0, 0]
-
-    # Compute h_om
-    h_om = m / u1 * (jerk - (z_B.T @ jerk)[0, 0] * z_B)
-
-    # Compute angular velocities 
-    p = float(-(h_om.T @ y_B)[0, 0])
-    q = float((h_om.T @ x_B)[0, 0])
-    r = float(dpsi * (z_W.T @ z_B)[0, 0]) 
-
-    return p, q, r
-
 
 def main():
     rclpy.init()
