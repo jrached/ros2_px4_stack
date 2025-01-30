@@ -57,8 +57,8 @@ if __name__ == "__main__":
 
         f"source ~/code/dynus_ws/install/setup.bash && source ~/code/dlio_ws/install/setup.bash && sleep 10 && ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 4
 
-        # f"ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}", # Pane 5
-        "echo mavros",
+        f"ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}", # Pane 5
+        #"echo mavros",
 
         f"sleep 15.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 6
 
