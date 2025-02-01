@@ -94,7 +94,7 @@ class OffboardDynusFollower(BasicMavrosInterface):
             self.setpoint_traj_pub.publish(self.trajectory_setpoint)
 
     def takeoff_cb(self):
-        freq = 100 #Hz
+        freq = 50 #Hz
         rate = self.create_rate(freq)
 
         takeoff_pos = self.point_to_traj([self.local_position.pose.position.x, self.local_position.pose.position.y, self.alt_])
