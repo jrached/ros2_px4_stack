@@ -66,8 +66,8 @@ if __name__ == "__main__":
 
         f"source ~/code/dynus_ws/install/setup.bash && source ~/code/get_init_pose.sh && sleep 10 && ros2 launch ros2_px4_stack dynus_mavros.launch.py", # Pane 8
 
-        # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/odom {veh}/mavros/setpoint_trajectory/local {veh}/dlio/odom_node/odom {veh}/goal", # Pane 9
-        f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record PX01/mavros/local_position/pose PX02/mavros/local_position/pose PX03/mavros/local_position/pose BD01/mavros/local_position/pose BD02/mavros/local_position/pose PX01/traj PX02/traj PX03/traj BD01/traj BD02/traj", # Pane 9
+         f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/odom {veh}/mavros/setpoint_trajectory/local {veh}/dlio/odom_node/odom {veh}/goal", # Pane 9
+       # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record PX01/mavros/local_position/pose PX02/mavros/local_position/pose PX03/mavros/local_position/pose BD01/mavros/local_position/pose BD02/mavros/local_position/pose PX01/traj PX02/traj PX03/traj BD01/traj BD02/traj", # Pane 9
         
     ]
     run_tmux_commands(session_name, commands)
