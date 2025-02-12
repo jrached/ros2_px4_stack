@@ -263,7 +263,7 @@ def get_orientation(point):
     return Rotation.from_matrix(R_W_B).as_quat() # As [x, y, z, w] vector
 
 def get_angular(point):
-    m = 2.6 # TODO get actual value 
+    m = 2.906  
     g = 9.81
     z_W = np.array([[0, 0, 1]]).T 
     x_B, y_B, z_B = get_drone_frame(point)
