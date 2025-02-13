@@ -45,8 +45,8 @@ class LivoxRepublisher(Node):
 
         # Publish pose and twist with covariance at the specified rate in a separate thread
         self._pub_hz = pub_hz
-        self._livox_pose_pub = self.create_publisher(PoseStamped, self.livox_pose_pub_topic_name, 10)
-        self._livox_twist_pub = self.create_publisher(TwistStamped, self.livox_twist_pub_topic_name, 10)
+        self._livox_pose_pub = self.create_publisher(PoseWithCovarianceStamped, self.livox_pose_pub_topic_name, 10)
+        self._livox_twist_pub = self.create_publisher(TwistWithCovarianceStamped, self.livox_twist_pub_topic_name, 10)
         self._pub_thread = Thread(target=self._publish_loop, args=())
         self._pub_thread.daemon = True
         self._pub_thread.start()
