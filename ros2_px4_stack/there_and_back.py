@@ -31,11 +31,11 @@ class ThereAndBackAgain(Node):
         qos_profile.reliability = ReliabilityPolicy.RELIABLE  
 
         # create publishers 
-        self.goal_topic = f"/{veh}/term_goal_gf"
+        self.goal_topic = f"/{self.veh}/term_goal_gf"
         self.goal_pub = self.create_publisher(PoseStamped, self.goal_topic, qos_profile)
 
         # create subscriptions 
-        self.state_topic = f"/{veh}/mavros/local_position/pose"
+        self.state_topic = f"/{self.veh}/mavros/local_position/pose"
         self.state_sub = self.create_subscription(PoseStamped, self.state_topic, self.state_cb, qos_profile)
 
     
@@ -53,7 +53,7 @@ class ThereAndBackAgain(Node):
             # Publish new goal 
             new_goal = PoseStamped() 
             new_goal.header.stamp = msg.header.stamp
-            new_goal.header.frame_id = f"/{veh}/term_goal_gf"
+            new_goal.header.frame_id = f"/{self.veh}/term_goal_gf"
             new_goal.pose.position.x = self.goal[0]
             new_pose.pose.position.y = self.goal[1]
             new_pose.pose.position.z = self.goal[2]
@@ -71,6 +71,7 @@ class ThereAndBackAgain(Node):
 
 
 def main(args=None):
+    args = sys.argv
     rclpy.init(args=args)
     x, y, z = 0.0, 0.0, 0.0
 
