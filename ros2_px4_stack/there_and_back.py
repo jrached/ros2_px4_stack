@@ -41,7 +41,7 @@ class ThereAndBackAgain(Node):
     
     def state_cb(self, msg: PoseStamped):
         # Extract state from message 
-        state = (msg.pose.x, msg.pose.y, msg.pose.z)
+        state = (msg.pose.position.x, msg.pose.position.y, msg.pose.position.z)
 
         if self.reached_goal(state):
             # Change goal 
