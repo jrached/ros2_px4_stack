@@ -22,8 +22,8 @@ class ThereAndBackAgain(Node):
         self.y_term_goal = y
         self.z_term_goal = z 
 
-        # initialize goal 
-        self.goal = (x, y, z)
+        # initialize goal (takeoff)
+        self.goal = (self.x_init, self.y_init, self.z_term_goal)
 
         # create qos policy 
         qos_profile = QoSProfile(depth=10)
@@ -45,10 +45,10 @@ class ThereAndBackAgain(Node):
 
         if self.reached_goal(state):
             # Change goal 
-            if self.goal == (self.x_init, self.y_init, self.z_init):
+            if self.goal == (self.x_init, self.y_init, self.z_term_goal):
                 self.goal = (self.x_term_goal, self.y_term_goal, self.z_term_goal)
             elif self.goal == (self.x_term_goal, self.y_term_goal, self.z_term_goal):
-                self.goal = (self.x_term_goal, self.y_term_goal, self.z_term_goal)
+                self.goal = (self.x_init, self.y_init, self.z_term_goal)
 
             # Publish new goal 
             new_goal = PoseStamped() 
