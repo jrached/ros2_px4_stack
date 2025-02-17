@@ -74,7 +74,7 @@ def main(args=None):
     rclpy.init(args=args)
     x, y, z = 0.0, 0.0, 0.0
 
-    if len(args) > 3
+    if len(args) > 3:
         try: 
             x, y, z = float(args[1]), float(args[2]), float(args[3])
         except ValueError:
