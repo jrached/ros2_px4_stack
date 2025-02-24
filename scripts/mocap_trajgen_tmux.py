@@ -28,7 +28,7 @@ def run_tmux_commands(session_name, commands):
         # Commands to run in each pane
         for i, cmd in enumerate(commands):
             # Construct the full command with setup steps
-            full_command = f"cd ~/code/mavros_ws && source install/setup.bash && {cmd}"
+            full_command = f"source ~/code/trajgen_ws/install/setup.bash && source ~/code/bridge_ws/install/setup.bash && source ~/code/mavros_ws/install/setup.bash && {cmd}"
             # Send the command to the corresponding pane
             subprocess.run(["tmux", "send-keys", "-t", f"{session_name}:0.{i}", full_command, "C-m"], check=True)
 

@@ -73,6 +73,7 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
         qos_profile.durability = DurabilityPolicy.VOLATILE
         qos_profile.reliability = ReliabilityPolicy.BEST_EFFORT
 
+
         # Traj gen sub/pub
         self.trajgen_goal_topic =  '/SQ01/goal'
         self.trajgen_state_topic = '/SQ01/state'
@@ -187,6 +188,7 @@ class OffboardTrajgenFollower(BasicMavrosInterface):
 
     def track_trajectory(self):
         # wait 1 second for FCU connection
+        self.get_logger().info("HERE1")
         self.wait_for_seconds(1)
         while rclpy.ok():
             if self.received_trajectory_setpoint != None:

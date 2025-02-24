@@ -49,9 +49,15 @@ class MocapToLivoxFrame(Node):
         
         af_goal = do_transform_pose(msg.pose, self.global_to_agent_tf)
 
+        tf_trans = self.global_to_agent_tf.transform.translation 
+        tf_rot = self.global_to_agent_tf.transform.rotation 
+
+        self.get_logger().info(f"The transform pos is: {(tf_trans.x, tf_trans.y, tf_trans.z)} ")
+        self.get_logger().info(f"The transform rot is: {(tf_rot.x, tf_rot.y, tf_rot.z, tf_rot.w)} ")
+
         af_goal_stamped = PoseStamped()
         af_goal_stamped.header.stamp = msg.header.stamp 
-        af_goal_stamped.header.frame_id = msg.header.frame_id
+        af_goal_stamped.header.frame_id = f"{veh}/goal_term"
         af_goal_stamped.pose = af_goal 
 
         self.af_goal_pub.publish(af_goal_stamped)

@@ -136,8 +136,9 @@ class OffboardDynusFollower(BasicMavrosInterface):
             f"Only local navigation is supported for this method"
         )
 
-        quat = get_orientation(point)
-        p, q, r = get_angular(point)
+        # quat = get_orientation(point)
+        quat = yaw_to_quaternion(point.yaw)
+        # p, q, r = get_angular(point)
 
         trajectory_points = [MultiDOFJointTrajectoryPoint(
             transforms=[Transform(
@@ -159,10 +160,15 @@ class OffboardDynusFollower(BasicMavrosInterface):
                     y=point.v.y,
                     z=point.v.z
                 ),
+                # angular=Vector3(
+                    # x=p,
+                    # y=q,
+                    # z=r
+                # )
                 angular=Vector3(
-                    x=p,
-                    y=q,
-                    z=r
+                    x=0.0,
+                    y=0.0,
+                    z=0.0
                 )
             )],
             accelerations=[Twist(
@@ -195,25 +201,25 @@ class OffboardDynusFollower(BasicMavrosInterface):
 
         while rclpy.ok():
             if flight_state == "TAKEOFF":
-                self.get_logger().info("Taking Off")
+                # self.get_logger().info("Taking Off")
 
                 self.trajectory_setpoint = takeoff_pos
 
                 if (self.traj_point_reached(takeoff_pos)
                     and self.received_trajectory_setpoint is not None):
-                    self.get_logger().info("Takeoff Complete")
+                    # self.get_logger().info("Takeoff Complete")
                     flight_state = "TRAJECTORY"
                     init_pos = takeoff_pos
 
             elif flight_state == "TRAJECTORY":
-                self.get_logger().info("Following Trajectory")
+                # self.get_logger().info("Following Trajectory")
                 if self.received_trajectory_setpoint:
                     self.trajectory_setpoint = self._pack_into_traj(self.received_trajectory_setpoint)
 
                 # If trajectory is over 
-                if (self.count_publishers(self.dynus_goal_topic) == 0):
-                    self.get_logger().info("Returning to Initial Position")
-                    flight_state = "RETURN"
+                # if (self.count_publishers(self.dynus_goal_topic) == 0):
+                #     self.get_logger().info("Returning to Initial Position")
+                #     flight_state = "RETURN"
             
             elif flight_state == "RETURN":
                 self.trajectory_setpoint = init_pos
