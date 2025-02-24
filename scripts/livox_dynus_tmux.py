@@ -69,7 +69,7 @@ if __name__ == "__main__":
         # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/odom {veh}/mavros/setpoint_trajectory/local {veh}/dlio/odom_node/odom {veh}/goal", # Pane 9
         # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record PX02/mavros/local_position/pose PX03/mavros/local_position/pose /trajs {veh}/dynamic_map_marker /tf /tf_static {veh}/goal {veh}/traj_committed_colored", 
         #f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record PX01/dlio/odom_node/pose PX02/dlio/odom_node/pose PX03/dlio/odom_node/pose", # Pane 9
-        f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/pose /trajs {veh}/dynamic_map_marker /tf /tf_static {veh}/goal {veh}/traj_committed_colored", 
+        f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/pose /trajs {veh}/dynamic_map_marker /tf /tf_static {veh}/goal {veh}/traj_committed_colored {veh}/term_goal", 
 
         
     ]

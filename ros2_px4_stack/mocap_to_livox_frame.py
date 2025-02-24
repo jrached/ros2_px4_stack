@@ -52,9 +52,6 @@ class MocapToLivoxFrame(Node):
         tf_trans = self.global_to_agent_tf.transform.translation 
         tf_rot = self.global_to_agent_tf.transform.rotation 
 
-        self.get_logger().info(f"The transform pos is: {(tf_trans.x, tf_trans.y, tf_trans.z)} ")
-        self.get_logger().info(f"The transform rot is: {(tf_rot.x, tf_rot.y, tf_rot.z, tf_rot.w)} ")
-
         af_goal_stamped = PoseStamped()
         af_goal_stamped.header.stamp = msg.header.stamp 
         af_goal_stamped.header.frame_id = f"{veh}/goal_term"
@@ -62,11 +59,24 @@ class MocapToLivoxFrame(Node):
 
         self.af_goal_pub.publish(af_goal_stamped)
 
+        tfs = TransformStamped()
+        tfs.header.stamp = msg.header.stamp 
+        tfs.header.frame_id = f"{veh}/init_pose"
+        tfs.child_frame_id = f"{veh}/pose_af"
+        tfs.transform.translation.x = af_goal.position.x  
+        tfs.transform.translation.y = af_goal.position.y  
+        tfs.transform.translation.z = af_goal.position.z  
+        tfs.transform.rotation = af_goal.orientation 
+
+        broadcaster.sendTransform(tfs) 
+
 
 def main(args=None):
     rclpy.init(args=args)
     node = MocapToLivoxFrame()
 
+    global broadcaster
+    broadcaster = TransformBroadcaster(node)
     try: 
         rclpy.spin(node)
     except KeyboardInterrupt: 
