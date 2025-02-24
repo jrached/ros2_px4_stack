@@ -62,24 +62,11 @@ class MocapToLivoxFrame(Node):
 
         self.af_goal_pub.publish(af_goal_stamped)
 
-        tfs = TransformStamped()
-        tfs.header.stamp = msg.header.stamp 
-        tfs.header.frame_id = f"{veh}/init_pose"
-        tfs.child_frame_id = f"{veh}/pose_af"
-        tfs.transform.translation.x = af_goal.position.x  
-        tfs.transform.translation.y = af_goal.position.y  
-        tfs.transform.translation.z = af_goal.position.z  
-        tfs.transform.rotation = af_goal.orientation 
-
-        broadcaster.sendTransform(tfs) 
-
 
 def main(args=None):
     rclpy.init(args=args)
     node = MocapToLivoxFrame()
 
-    global broadcaster
-    broadcaster = TransformBroadcaster(node)
     try: 
         rclpy.spin(node)
     except KeyboardInterrupt: 
