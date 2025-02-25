@@ -24,6 +24,7 @@ def run_tmux_commands(session_name, commands):
         subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0.4"], check=True) # Split bottom-left horizontally
         subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.5"], check=True) # Split bottom-right vertically
         subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.0"], check=True) # Split bottom-right vertically
+        subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0.0"], check=True) # Split last horizontally
 
         # Commands to run in each pane
         for i, cmd in enumerate(commands):
@@ -51,29 +52,28 @@ if __name__ == "__main__":
         f"source ~/code/dynus_ws/install/setup.bash && source ~/code/decomp_ws/install/setup.bash && sleep 10 && ros2 launch dynus onboard_dynus.launch.py x:=0.0 y:=0.0 z:=0.0 yaw:=0 namespace:={veh} use_obstacle_tracker:=false use_ground_robot:=false use_hardware:=true " \
         "use_onboard_localization:=true depth_camera_name:=d455",  # Command for pane 1
 
-        "echo 'not using d455'", # Pane 2
+        f"source ~/code/livox_ws/install/setup.bash && sleep 10 && ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 2
 
-        f"source ~/code/livox_ws/install/setup.bash && sleep 10 && ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 3
+        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/dlio_ws/install/setup.bash && sleep 10 && ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 3
 
-        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/dlio_ws/install/setup.bash && sleep 10 && ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 4
+        f"sleep 5.0 && ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}", # Pane 4
 
-        f"ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}", # Pane 5
-        #"echo mavros",
-
-        f"sleep 15.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 6
+        f"source ~/code/dynus_ws/install/setup.bash && sleep 10 && source ~/code/get_init_pose.sh && ros2 launch ros2_px4_stack dynus_mavros.launch.py", # Pane 5
+       
+        f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/pose {veh}/world {veh}/traj_committed_colored {veh}/dynamic_map_marker {veh}/goal /tf /tf_static /trajs", # Pane 6
 
         f"sleep 15.0 && ros2 topic echo /{veh}/dlio/odom_node/pose", # Pane  7
+        
+        f"sleep 15.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 8
 
-        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/get_init_pose.sh && sleep 10 && ros2 launch ros2_px4_stack dynus_mavros.launch.py", # Pane 8
+        'sleep 10.0 && source ~/code/get_init_pose.sh && echo && echo "init pos: (${INIT_X}, ${INIT_Y}, ${INIT_Z})" && echo "init att: (${INIT_ROLL}, ${INIT_PITCH}, ${INIT_YAW})" && echo', # Pane 9
 
-        # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/odom {veh}/mavros/setpoint_trajectory/local {veh}/dlio/odom_node/odom {veh}/goal", # Pane 9
-        # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record PX02/mavros/local_position/pose PX03/mavros/local_position/pose /trajs {veh}/dynamic_map_marker /tf /tf_static {veh}/goal {veh}/traj_committed_colored", 
-        #f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record PX01/dlio/odom_node/pose PX02/dlio/odom_node/pose PX03/dlio/odom_node/pose", # Pane 9
-        f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/pose /trajs {veh}/dynamic_map_marker /tf /tf_static {veh}/goal {veh}/traj_committed_colored {veh}/term_goal", 
-
+        f"zenoh_router", # Pane 10
         
     ]
     run_tmux_commands(session_name, commands)
+
+
 
 
 
