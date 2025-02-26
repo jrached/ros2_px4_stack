@@ -15,10 +15,10 @@ class MocapToLivoxFrame(Node):
         super().__init__('mocap_to_livox_frame')
 
         # Make subscription for global frame goal command
-        self.gf_goal_sub = self.create_subscription(PoseStamped, "term_goal_gf", self.goal_cb, 10)
+        self.gf_goal_sub = self.create_subscription(PoseStamped, "term_goal", self.goal_cb, 10)
 
         # Make publisher for agent frame command 
-        self.af_goal_pub = self.create_publisher(PoseStamped, "term_goal", 10)
+        self.af_goal_pub = self.create_publisher(PoseStamped, "term_goal_af", 10)
 
         # Make transform listener
         self.tf_buffer = Buffer()
@@ -29,9 +29,6 @@ class MocapToLivoxFrame(Node):
 
     def get_gf_to_af_tf(self):
         # Get static transform between livox initial position and mocap origin
-        while not self.tf_buffer.can_transform(f"{veh}/init_pose", "world_mocap", self.get_clock().now()):
-            self.get_logger().info(f"Waiting for transform")
-            rclpy.spin_once(self, timeout_sec=1.0)
 
         return self.tf_buffer.lookup_transform(f"{veh}/init_pose", "world_mocap", self.get_clock().now())
 
@@ -54,7 +51,7 @@ class MocapToLivoxFrame(Node):
 
         af_goal_stamped = PoseStamped()
         af_goal_stamped.header.stamp = msg.header.stamp 
-        af_goal_stamped.header.frame_id = f"{veh}/goal_term"
+        af_goal_stamped.header.frame_id = f"{veh}/goal_term_af"
         af_goal_stamped.pose = af_goal 
 
         self.af_goal_pub.publish(af_goal_stamped)

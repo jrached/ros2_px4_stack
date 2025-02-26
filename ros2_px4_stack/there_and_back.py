@@ -35,13 +35,13 @@ class ThereAndBackAgain(Node):
         qos_profile2.reliability = ReliabilityPolicy.RELIABLE
 
         # create publishers 
-        self.goal_topic = f"/{self.veh}/term_goal_gf"
+        self.goal_topic = f"/{self.veh}/term_goal"
         self.goal_pub = self.create_publisher(PoseStamped, self.goal_topic, qos_profile2)
 
         # create subscriptions 
         self.state_topic = f"/{self.veh}/mavros/local_position/pose"
         self.state_sub = self.create_subscription(PoseStamped, self.state_topic, self.state_cb, qos_profile1)
-        self.goal_af_topic = f"/{self.veh}/term_goal" # Terminal goal in the agent frame 
+        self.goal_af_topic = f"/{self.veh}/term_goal_af" # Terminal goal in the agent frame 
         self.goal_ag_sub = self.create_subscription(PoseStamped, self.goal_af_topic, self.goal_af_cb, qos_profile2)
 
         # agent frame term_goal 
@@ -59,7 +59,7 @@ class ThereAndBackAgain(Node):
         if self.goal_af == None: 
             new_goal = PoseStamped() 
             new_goal.header.stamp = msg.header.stamp
-            new_goal.header.frame_id = f"/{self.veh}/term_goal_gf"
+            new_goal.header.frame_id = f"/{self.veh}/term_goal"
             new_goal.pose.position.x = self.goal[0]
             new_goal.pose.position.y = self.goal[1]
             new_goal.pose.position.z = self.goal[2]
@@ -80,7 +80,7 @@ class ThereAndBackAgain(Node):
             # Publish new goal in global frame 
             new_goal = PoseStamped() 
             new_goal.header.stamp = msg.header.stamp
-            new_goal.header.frame_id = f"/{self.veh}/term_goal_gf"
+            new_goal.header.frame_id = f"/{self.veh}/term_goal"
             new_goal.pose.position.x = self.goal[0]
             new_goal.pose.position.y = self.goal[1]
             new_goal.pose.position.z = self.goal[2]
