@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
         f"source ~/code/dynus_ws/install/setup.bash && sleep 10 && source ~/code/get_init_pose.sh && ros2 launch ros2_px4_stack dynus_mavros.launch.py", # Pane 5
        
-        f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/pose {veh}/world {veh}/traj_committed_colored {veh}/dynamic_map_marker {veh}/goal /tf /tf_static /trajs", # Pane 6
+        f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/pose {veh}/world {veh}/traj_committed_colored {veh}/dynamic_map_marker {veh}/goal /tf /tf_static /trajs {veh}/dgp_path_marker", # Pane 6
 
         f"sleep 15.0 && ros2 topic echo /{veh}/dlio/odom_node/pose", # Pane  7
         
