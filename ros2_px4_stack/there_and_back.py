@@ -22,6 +22,8 @@ class ThereAndBackAgain(Node):
 
         # initialize goal (takeoff)
         self.goal = None 
+        self.x_init = None
+        self.y_init = None
         
         # create qos policy 
         qos_profile1 = QoSProfile(depth=10)
@@ -40,7 +42,7 @@ class ThereAndBackAgain(Node):
         self.state_topic = f"/{self.veh}/mavros/local_position/pose"
         self.state_sub = self.create_subscription(PoseStamped, self.state_topic, self.state_cb, qos_profile1)
         self.goal_af_topic = f"/{self.veh}/term_goal_af" # Terminal goal in the agent frame 
-        self.goal_ag_sub = self.create_subscription(PoseStamped, self.goal_af_topic, self.goal_af_cb, qos_profile2)
+        self.goal_af_sub = self.create_subscription(PoseStamped, self.goal_af_topic, self.goal_af_cb, qos_profile2)
 
         # agent frame term_goal 
         self.goal_af = None 
@@ -62,6 +64,8 @@ class ThereAndBackAgain(Node):
             
             self.init_pose_tf = self.tf_buffer.lookup_transform("world_mocap", f"{self.veh}/init_pose", self.get_clock().now())
             translation = self.init_pose_tf.transform.translation
+            self.x_init = translation.x 
+            self.y_init = translation.y 
             self.goal = (translation.x, translation.y, self.z_term_goal)
 
     def goal_af_cb(self, msg):
