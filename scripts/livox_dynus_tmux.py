@@ -52,24 +52,24 @@ if __name__ == "__main__":
         f"source ~/code/dynus_ws/install/setup.bash && source ~/code/decomp_ws/install/setup.bash && sleep 10 && ros2 launch dynus onboard_dynus.launch.py x:=0.0 y:=0.0 z:=0.0 yaw:=0 namespace:={veh} use_obstacle_tracker:=false use_ground_robot:=false use_hardware:=true " \
         "use_onboard_localization:=true depth_camera_name:=d455",  # Command for pane 1
 
-        f"source ~/code/livox_ws/install/setup.bash && sleep 10 && ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 2
+        # f"source ~/code/realsense-ros_ws/install/setup.bash && sleep 10 && ros2 launch realsense2_camera rs_d455_launch.py camera_namespace:=PX02 align_depth:=true depth_width:=320 depth_height:=240 depth_fps:=5.0 color_width:=320 color_height:=240 color_fps:=5.0", # Pane  2
 
-        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/dlio_ws/install/setup.bash && sleep 10 && ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 3
+        f"source ~/code/livox_ws/install/setup.bash && sleep 10 && ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 3
 
-        f"sleep 5.0 && ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}", # Pane 4
+        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/dlio_ws/install/setup.bash && sleep 10 && ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 4
 
-        f"source ~/code/dynus_ws/install/setup.bash && sleep 10 && source ~/code/get_init_pose.sh && ros2 launch ros2_px4_stack dynus_mavros.launch.py", # Pane 5
-       
-        f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/pose {veh}/world {veh}/traj_committed_colored {veh}/dynamic_map_marker {veh}/goal /tf /tf_static /trajs {veh}/dgp_path_marker {veh}/occupied_cells_vis_array", # Pane 6
+        f"sleep 5.0 && ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}", # Pane 5
 
-        f"sleep 15.0 && ros2 topic echo /{veh}/dlio/odom_node/pose", # Pane  7
+        f"source ~/code/dynus_ws/install/setup.bash && sleep 10 && source ~/code/get_init_pose.sh && ros2 launch ros2_px4_stack dynus_mavros.launch.py", # Pane 6
+        # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag*", # Pane 7
+        f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record  /PX01/world /tf /tf_static {veh}/d455/depth/color/points {veh}/tracked_obstacles {veh}/cluster_bounding_boxes {veh}/uncertainty_spheres", # Pane 7
+        # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/pose {veh}/world {veh}/traj_committed_colored {veh}/dynamic_map_marker {veh}/goal /tf /tf_static /trajs {veh}/dgp_path_marker {veh}/camera/color/image_raw", # Pane 7
         
-        f"sleep 15.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 8
+        f"sleep 15.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 8 
 
         'sleep 10.0 && source ~/code/get_init_pose.sh && echo && echo "init pos: (${INIT_X}, ${INIT_Y}, ${INIT_Z})" && echo "init att: (${INIT_ROLL}, ${INIT_PITCH}, ${INIT_YAW})" && echo', # Pane 9
 
         f"zenoh_router", # Pane 10
-        
     ]
     run_tmux_commands(session_name, commands)
 
