@@ -22,6 +22,7 @@ def generate_launch_description():
             package='ros2_px4_stack',
             executable='track_gen_traj',
             name='track_gen_traj_py',
+            namespace=namespace,
             output='screen',
         ),
         # Static transform publishers
