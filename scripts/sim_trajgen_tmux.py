@@ -2,6 +2,7 @@
 
 import subprocess
 import os 
+import argparse
 
 def run_tmux_commands(session_name, commands):
     """
@@ -46,10 +47,19 @@ if __name__ == "__main__":
     # Define the session name and commands
     veh = os.environ.get("VEH_NAME")
     mav_id = os.environ.get("MAV_SYS_ID")
+
+    # Get doublet velocity and period 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--vel', type=float, required=True, help='Magnitude of doublet')
+    parser.add_argument('--period', type=float, required=True, help='Period of doublet')
+    args = parser.parse_args()
+    vel = args.vel
+    period = args.period
+
     session_name = f"{veh}_tmux_session"
     commands = [
         f"ros2 launch mavros px4.launch fcu_url:='udp://:14540@localhost:14557' namespace:={veh}/mavros tgt_system:={mav_id}",  # Command for pane 1
-        "ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for pane 2
+        f"ros2 launch trajectory_generator_ros2 onboard.launch.py vel:={vel} period:={period}",  # Command for pane 2
         "ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
         "ros2 launch ros2_px4_stack livox_gen_traj.launch.py",  # Command for pane 4,
         f"cd ~/acl/px4/PX4-Autopilot && make px4_sitl gz_x500", # Pane 5
