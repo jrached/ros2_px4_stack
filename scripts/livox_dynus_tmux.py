@@ -64,7 +64,7 @@ if __name__ == "__main__":
         # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag*", # Pane 7
         # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record  /PX01/world /tf /tf_static {veh}/tracked_obstacles {veh}/cluster_bounding_boxes {veh}/uncertainty_spheres", # Pane 7
 
-        f"sleep 15 && source /home/swarm/code/decomp_ws/install/setup.bash && rm -rf /home/swarm/data/num_1 && python3 /home/swarm/code/dynus_ws/src/dynus/scripts/bag_record.py --bag_number 1 --bag_path /home/swarm/data",
+        f"sleep 15 && source /home/swarm/code/decomp_ws/install/setup.bash && rm -rf /home/swarm/data/num_1 && source /home/swarm/code/dynus_ws/install/setup.bash && python3 /home/swarm/code/dynus_ws/src/dynus/scripts/bag_record.py --bag_number 1 --bag_path /home/swarm/data",
         # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record {veh}/mavros/local_position/pose {veh}/world {veh}/traj_committed_colored {veh}/dynamic_map_marker {veh}/goal /tf /tf_static /trajs {veh}/dgp_path_marker {veh}/camera/color/image_raw", # Pane 7
         
         f"sleep 15.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 8 
