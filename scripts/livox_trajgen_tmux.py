@@ -24,11 +24,12 @@ def run_tmux_commands(session_name, commands):
         subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0.4"], check=True) # Split bottom-left horizontally
         subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.5"], check=True) # Split bottom-right vertically
         subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.0"], check=True) # Split bottom-right vertically
+        subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0.0"], check=True) # Split last horizontally
 
         # Commands to run in each pane
         for i, cmd in enumerate(commands):
             # Construct the full command with setup steps
-            full_command = f"cd ~/code/mavros_ws && source install/setup.bash && {cmd}"
+            full_command = f"source ~/code/bridge_ws/install/setup.bash && source ~/code/trajgen_ws/install/setup.bash && cd ~/code/mavros_ws && source install/setup.bash && {cmd}"
             # Send the command to the corresponding pane
             subprocess.run(["tmux", "send-keys", "-t", f"{session_name}:0.{i}", full_command, "C-m"], check=True)
 
@@ -51,11 +52,12 @@ if __name__ == "__main__":
         f"ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}",  # Command for pane 1
         "ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for pane 2
         "ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
-        "ros2 launch ros2_px4_stack livox_gen_traj.launch.py",  # Command for pane 4,
-        f"ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 5
-        f"ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 6
+        "sleep 5.0 && source ~/code/get_init_pose.sh && ros2 launch ros2_px4_stack livox_gen_traj.launch.py",  # Command for pane 4,
+        f"source ~/code/livox_ws/install/setup.bash && ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 5
+        f"source ~/code/dlio_ws/install/setup.bash && ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 6
         f"sleep 10.0 && cd bags && cd test && rm -rf rosbag* && ros2 bag record /SQ01/goal {veh}/mavros/local_position/pose {veh}/mavros/local_position/velocity_local /{veh}/dlio/odom_node/pose", # Pane 7
         f"ros2 topic echo {veh}/mavros/local_position/pose", # Pane 8
-        f"sleep 10.0 && ros2 topic echo /{veh}/dlio/odom_node/pose", # Pane  9
+        'sleep 5.0 && source ~/code/get_init_pose.sh && echo && echo "init pos: (${INIT_X}, ${INIT_Y}, ${INIT_Z})" && echo "init att: (${INIT_ROLL}, ${INIT_PITCH}, ${INIT_YAW})" && echo', # Pane 9",
+        'zenoh_router',
     ]
     run_tmux_commands(session_name, commands)

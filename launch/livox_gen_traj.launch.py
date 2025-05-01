@@ -23,6 +23,7 @@ def generate_launch_description():
             executable='track_gen_traj',
             name='track_gen_traj_py',
             output='screen',
+            namespace=namespace
         ),
         # Static transform publishers
         # Node(
