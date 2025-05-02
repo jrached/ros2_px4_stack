@@ -29,7 +29,7 @@ def run_tmux_commands(session_name, commands):
         # Commands to run in each pane
         for i, cmd in enumerate(commands):
             # Construct the full command with setup steps
-            full_command = f"cd ~/code/mavros_ws && source install/setup.bash && {cmd}"
+            full_command = f"cd ~/dynus_code/mavros_ws && source install/setup.bash && {cmd}"
             # Send the command to the corresponding pane
             subprocess.run(["tmux", "send-keys", "-t", f"{session_name}:0.{i}", full_command, "C-m"], check=True)
 
@@ -50,8 +50,8 @@ if __name__ == "__main__":
 
     # Get doublet velocity and period 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--vel', type=float, required=True, help='Magnitude of doublet')
-    parser.add_argument('--period', type=float, required=True, help='Period of doublet')
+    parser.add_argument('--vel', type=float, default=1.0, help='Magnitude of doublet')
+    parser.add_argument('--period', type=float, default=4.0, help='Period of doublet')
     args = parser.parse_args()
     vel = args.vel
     period = args.period
@@ -62,7 +62,7 @@ if __name__ == "__main__":
         f"ros2 launch trajectory_generator_ros2 onboard.launch.py vel:={vel} period:={period}",  # Command for pane 2
         "ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
         "ros2 launch ros2_px4_stack livox_gen_traj.launch.py",  # Command for pane 4,
-        f"cd ~/acl/px4/PX4-Autopilot && make px4_sitl gz_x500", # Pane 5
+        f"cd ~/acl/px4/PX4-Autopilot && make px4_sitl gazebo-classic", # Pane 5
         f"sleep 10.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 6
         f"sleep 10.0 && ros2 topic echo {veh}/goal", # Pane  7
         f"sleep 10.0 && cd bags && cd sim_tests && rm -rf sim_bag* && ros2 bag record -o sim_bag /SQ01/goal {veh}/mavros/local_position/pose {veh}/mavros/local_position/velocity_local {veh}/mavros/setpoint_raw/target_attitude", # Pane 9

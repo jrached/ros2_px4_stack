@@ -166,7 +166,7 @@ class SineSweep(BasicMavrosInterface):
         return traj
 
     def track_sine_sweep(self, sine_sweep, altitude=1.5):
-        
+        tolerance = 0.1
         # wait 1 second for FCU connection
         self.wait_for_seconds(1)
 
@@ -178,7 +178,7 @@ class SineSweep(BasicMavrosInterface):
 
                 self.trajectory_setpoint = takeoff_pos
 
-                if (self.traj_point_reached(takeoff_pos)):
+                if abs(self.local_position.pose.position.z - altitude) <= tolerance:
                     flight_state = "TRAJECTORY"
                     init_pos = takeoff_pos
 
@@ -193,7 +193,7 @@ class SineSweep(BasicMavrosInterface):
             elif flight_state == "RETURN":
                 self.trajectory_setpoint = init_pos
 
-            self.wait_for_seconds(0.2)
+            self.wait_for_seconds(0.01)
 
     
 ########################

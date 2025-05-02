@@ -91,7 +91,7 @@ class SineSweepTracker(SineSweep):
 
         total_duration = 60
         t = np.linspace(0, total_duration, int(sampling_rate * total_duration))
-        sine_sweep = chirp(t, f0=0.1, f1=5.0, t1=total_duration, method='log')
+        sine_sweep = chirp(t, f0=0.01, f1=3.0, t1=total_duration, method='log')
 
         return list(sine_sweep)  
 
@@ -103,7 +103,7 @@ class SineSweepTracker(SineSweep):
 def main(args=None):
     rclpy.init(args=args)
 
-    sine_sweep = False 
+    sine_sweep = True 
     if sine_sweep:
         traj_tracker = SineSweepTracker()
         traj_tracker.track_trajectory()
