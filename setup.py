@@ -32,6 +32,7 @@ setup(
             'get_init_pose = ros2_px4_stack.get_init_pose:main',
             'mocap_to_livox_frame = ros2_px4_stack.mocap_to_livox_frame:main',
             'there_and_back = ros2_px4_stack.there_and_back:main',
+            'kalman = ros2_px4_stack.kalman:main',
         ],
     },
 )

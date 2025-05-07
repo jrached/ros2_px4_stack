@@ -103,7 +103,7 @@ class SineSweepTracker(SineSweep):
 def main(args=None):
     rclpy.init(args=args)
 
-    sine_sweep = True 
+    sine_sweep = False 
     if sine_sweep:
         traj_tracker = SineSweepTracker()
         traj_tracker.track_trajectory()
