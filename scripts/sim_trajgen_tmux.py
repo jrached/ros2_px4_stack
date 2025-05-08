@@ -32,7 +32,7 @@ def run_tmux_commands(session_name, commands):
         # Commands to run in each pane
         for i, cmd in enumerate(commands):
             # Construct the full command with setup steps
-            full_command = f"cd {path_to_mavros}/mavros_ws && source install/setup.bash && {cmd}"
+            full_command = f"source ~/code/trajgen_ws/install/setup.bash && cd {path_to_mavros}/mavros_ws && source install/setup.bash && {cmd}"
             # Send the command to the corresponding pane
             subprocess.run(["tmux", "send-keys", "-t", f"{session_name}:0.{i}", full_command, "C-m"], check=True)
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         f"cd {path_to_mavros}/px4/PX4-Autopilot && make px4_sitl gazebo-classic", # Pane 5
         f"sleep 10.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 6
         f"sleep 10.0 && ros2 topic echo {veh}/goal", # Pane  7
-        f"sleep 10.0 && cd bags && cd sim_tests && rm -rf sim_bag* && ros2 bag record -o sim_bag /{veh}/pos_est /{veh}/vel_est /{veh}/goal {veh}/mavros/local_position/pose {veh}/mavros/local_position/velocity_local {veh}/mavros/setpoint_raw/target_attitude", # Pane 9
+        f"sleep 10.0 && cd bags/ukf/circle && rm -rf sim_bag* && ros2 bag record -o sim_bag /{veh}/pos_est /{veh}/vel_est /{veh}/goal {veh}/mavros/local_position/pose {veh}/mavros/local_position/velocity_local {veh}/mavros/setpoint_raw/target_attitude", # Pane 9
         "echo ros2 service call /change_mode mission_mode/srv/MissionModeChange \\\"{mode: 1}\\\" | xclip -selection clipboard", # Pane 8
     ]
     run_tmux_commands(session_name, commands)
