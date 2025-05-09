@@ -57,18 +57,18 @@ def generate_launch_description():
             namespace=namespace,
             output='screen',
         ),
-        Node(
-            package='ros2_px4_stack',
-            executable='kalman',
-            name='kalman_py',
-            namespace=namespace,
-            output='screen',
-        ),
         # Node(
-        #    package='ros2_px4_stack',
-        #     executable='ukf',
-        #     name='ukf_py',
+        #     package='ros2_px4_stack',
+        #     executable='kalman',
+        #     name='kalman_py',
         #     namespace=namespace,
-        #     output='screen', 
+        #     output='screen',
         # )
+        Node(
+           package='ros2_px4_stack',
+            executable='ukf',
+            name='ukf_py',
+            namespace=namespace,
+            output='screen', 
+        )
     ])

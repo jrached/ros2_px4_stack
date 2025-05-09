@@ -240,9 +240,9 @@ class UKF(Node):
         # Model noise as either a function of control or just even noise 
         even_noise = True 
         if even_noise: 
-            self.W = np.diag([1e-6, 1e-6, 1e-6, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-9, 1e-4, 1e-4, 1e-9]) # vel 1.0 Best correct orientation
+            # self.W = np.diag([1e-6, 1e-6, 1e-6, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-9, 1e-4, 1e-4, 1e-9]) # vel 1.0 Best correct orientation
             # self.W = np.diag([1e-4, 1e-4, 1e-3, 1e-1, 1e-1, 1e-1, 1e-3, 1e-4, 1e-4, 1e-4, 1e-2, 1e-2, 1e-2])  # vel 3.0
-            # self.W = np.diag([1e-6, 1e-6, 1e-6, 1e-3, 1e-3, 1e-3, 1e-7, 1e-7, 1e-7, 1e-9, 1e-7, 1e-7, 1e-9]) # vel 1.0 Perfect inverse orientation 
+            self.W = np.diag([1e-6, 1e-6, 1e-6, 1e-3, 1e-3, 1e-3, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-9]) # vel 1.0 Perfect inverse orientation 
             self.R = quad.R
         else:
             self.W = quad.W 
@@ -424,9 +424,11 @@ def main(args=None):
     rclpy.init(args=args)
 
     # Define initial conditions 
-    Q0 = np.diag([1e-1, 1e-1, 1e-1, 1e-1, 1e-1, 1e-1, 1e-3, 1e-3, 1e-3, 1e-3, 1e-2, 1e-2, 1e-2])
+    Q0 = np.diag([1e-7, 1e-7, 1e-7, 1e-7, 1e-7, 1e-7, 1e-7, 1e-7, 1e-7, 1e-7, 1e-7, 1e-7, 1e-7]) * 0.01
     # Q0 = np.diag([1.] * 13) * 0.1
-    x0 = np.array([[0., 0., 1.5, 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.,]]).T # p: 0, 0, 1.5; v: 0, 0, 0; q: 1, 0, 0, 0; omega: 0, 0, 0
+    # x0 = np.array([[0., 0., 1.5, 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.,]]).T # p: 0, 0, 1.5; v: 0, 0, 0; q: 1, 0, 0, 0; omega: 0, 0, 0
+    # x0 = np.array([[0., 0., 1.5, 0., 0., 0., 0.7071, -0.7071, 0.0, 0.0, 0., 0., 0.,]]).T #  Start at -pi/2 rotation from origin
+    x0 = np.array([[0., 0., 0.0, 0., 0., 0., -0.7071, 0, 0, -0.7071, 0., 0., 0.,]]).T #  Start at +pi/2 rotation from origin
 
     # Initialize quad then ufk
     sampling_rate = 30 # Hz, same as flight controller publishing freq.

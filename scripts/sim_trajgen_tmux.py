@@ -68,7 +68,7 @@ if __name__ == "__main__":
         f"cd {path_to_mavros}/px4/PX4-Autopilot && make px4_sitl gazebo-classic", # Pane 5
         f"sleep 10.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 6
         f"sleep 10.0 && ros2 topic echo {veh}/goal", # Pane  7
-        f"sleep 10.0 && cd bags/kf/circle && rm -rf sim_bag* && ros2 bag record -o sim_bag /{veh}/pos_est /{veh}/vel_est /{veh}/goal {veh}/mavros/local_position/pose {veh}/mavros/local_position/velocity_local {veh}/mavros/setpoint_raw/target_attitude", # Pane 9
+        f"sleep 10.0 && cd bags/ukf/circle && rm -rf sim_bag* && ros2 bag record -o sim_bag /{veh}/pos_est /{veh}/vel_est /{veh}/goal {veh}/mavros/local_position/pose {veh}/mavros/local_position/velocity_local {veh}/mavros/setpoint_raw/target_attitude", # Pane 9
         "echo ros2 service call /change_mode mission_mode/srv/MissionModeChange \\\"{mode: 1}\\\" | xclip -selection clipboard", # Pane 8
     ]
     run_tmux_commands(session_name, commands)
