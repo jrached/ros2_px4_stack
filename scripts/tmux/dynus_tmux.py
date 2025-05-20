@@ -57,7 +57,7 @@ if __name__ == "__main__":
     odom_type = args.odom_type 
 
     commands = [
-        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/decomp_ws/install/setup.bash && sleep 10 && ros2 launch dynus onboard_dynus.launch.py x:=0.0 y:=0.0 z:=0.0 yaw:=0 namespace:={veh} use_obstacle_tracker:=true use_ground_robot:=false use_hardware:=true " \
+        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/decomp_ws/install/setup.bash && sleep 10 && ros2 launch dynus onboard_dynus.launch.py x:=0.0 y:=0.0 z:=0.0 yaw:=0 namespace:={veh} use_obstacle_tracker:=false use_ground_robot:=false use_hardware:=true " \
         "use_onboard_localization:=true depth_camera_name:=d455",  # Command for pane 1
 
         # f"source ~/code/realsense-ros_ws/install/setup.bash && sleep 10 && ros2 launch realsense2_camera rs_d455_launch.py camera_namespace:=PX02 align_depth:=true depth_width:=320 depth_height:=240 depth_fps:=5.0 color_width:=320 color_height:=240 color_fps:=5.0", # Pane  2
