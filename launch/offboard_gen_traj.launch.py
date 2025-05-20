@@ -15,6 +15,8 @@ def generate_launch_description():
         DeclareLaunchArgument('ns', default_value=EnvironmentVariable("VEH_NAME")),
         DeclareLaunchArgument('fcu_url', default_value='/dev/ttyACM0:921600'),
         DeclareLaunchArgument('respawn_mavros', default_value='false'),
+        DeclareLaunchArgument('odom_type', default_value='mocap'),
+
         Node(
             package='ros2_px4_stack',
             executable='track_gen_traj',
@@ -36,9 +38,12 @@ def generate_launch_description():
         ),
         Node(
             package='ros2_px4_stack',
-            executable='repub_mocap',
-            name='repub_mocap_py',
+            executable='repub_odom',
+            name='repub_odom_py',
             namespace=namespace,
             output='screen',
+            parameters=[{
+                '~odom_type': LaunchConfiguration('odom_type'),
+            }]
         ),
     ])

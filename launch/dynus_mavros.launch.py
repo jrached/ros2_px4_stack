@@ -19,6 +19,7 @@ def generate_launch_description():
         DeclareLaunchArgument('ns', default_value=EnvironmentVariable("VEH_NAME")),
         DeclareLaunchArgument('fcu_url', default_value='/dev/ttyACM0:921600'),
         DeclareLaunchArgument('respawn_mavros', default_value='false'),
+        DeclareLaunchArgument('odom_type', default_value='livox'),
         
         # Run dynus node
         Node(
@@ -58,10 +59,13 @@ def generate_launch_description():
         # Run repub_livox node
         Node(
             package='ros2_px4_stack',
-            executable='repub_livox',
-            name='repub_livox_py',
+            executable='repub_odom',
+            name='repub_odom_py',
             namespace=namespace,
             output='screen',
+            parameters=[{
+                '~odom_type': LaunchConfiguration('odom_type'),
+            }]
         ),
 
         # Run mocap to livox command frame conversion

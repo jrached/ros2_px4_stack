@@ -2,6 +2,7 @@
 
 import subprocess
 import os 
+import argparse 
 
 def run_tmux_commands(session_name, commands):
     """
@@ -23,13 +24,13 @@ def run_tmux_commands(session_name, commands):
         subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0.3"], check=True) # Split bottom-right horizontally
         subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0.4"], check=True) # Split bottom-left horizontally
         subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.5"], check=True) # Split bottom-right vertically
-        subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.0"], check=True) # Split bottom-right vertically
         subprocess.run(["tmux", "split-window", "-h", "-t", f"{session_name}:0.0"], check=True) # Split last horizontally
+        subprocess.run(["tmux", "split-window", "-v", "-t", f"{session_name}:0.0"], check=True) # Split bottom-right vertically
 
         # Commands to run in each pane
         for i, cmd in enumerate(commands):
             # Construct the full command with setup steps
-            full_command = f"source ~/code/bridge_ws/install/setup.bash && source ~/code/trajgen_ws/install/setup.bash && cd ~/code/mavros_ws && source install/setup.bash && {cmd}"
+            full_command = f"source ~/code/trajgen_ws/install/setup.bash && source ~/code/bridge_ws/install/setup.bash && source ~/code/mavros_ws/install/setup.bash && {cmd}"
             # Send the command to the corresponding pane
             subprocess.run(["tmux", "send-keys", "-t", f"{session_name}:0.{i}", full_command, "C-m"], check=True)
 
@@ -48,16 +49,29 @@ if __name__ == "__main__":
     veh = os.environ.get("VEH_NAME")
     mav_id = os.environ.get("MAV_SYS_ID")
     session_name = f"{veh}_tmux_session"
+
+    # Get odom_type parameters from user 
+    parser = argparse.ArgumentParser() 
+    parser.add_argument('--odom_type', type=str, default="mocap", help="Odometry measurement to send flight controller - motion capture or lidar")
+    args = parser.parse_args()
+    odom_type = args.odom_type 
+
+    if odom_type == "mocap":
+        gt_odom_topic = "/world"
+    else: 
+        gt_odom_topic = "/dlio/odom_node/pose"
+        
     commands = [
         f"ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}",  # Command for pane 1
         "ros2 launch trajectory_generator_ros2 onboard.launch.py",  # Command for pane 2
         "ros2 launch trajectory_generator_ros2 base_station.launch.py",  # Command for pane 3
-        "sleep 5.0 && source ~/code/get_init_pose.sh && ros2 launch ros2_px4_stack livox_gen_traj.launch.py",  # Command for pane 4,
-        f"source ~/code/livox_ws/install/setup.bash && ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 5
-        f"source ~/code/dlio_ws/install/setup.bash && ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 6
-        f"sleep 10.0 && cd bags && cd test && rm -rf rosbag* && ros2 bag record /SQ01/goal {veh}/mavros/local_position/pose {veh}/mavros/local_position/velocity_local /{veh}/dlio/odom_node/pose", # Pane 7
-        f"ros2 topic echo {veh}/mavros/local_position/pose", # Pane 8
-        'sleep 5.0 && source ~/code/get_init_pose.sh && echo && echo "init pos: (${INIT_X}, ${INIT_Y}, ${INIT_Z})" && echo "init att: (${INIT_ROLL}, ${INIT_PITCH}, ${INIT_YAW})" && echo', # Pane 9",
-        'zenoh_router',
+        f"ros2 launch ros2_px4_stack offboard_gen_traj.launch.py odom_type:={odom_type}",  # Command for pane 4,
+        f"source ~/code/livox_ws/install/setup.bash && sleep 10 && ros2 launch livox_ros_driver2 run_MID360_launch.py namespace:={veh}", # Pane 5
+        f"source ~/code/dynus_ws/install/setup.bash && source ~/code/dlio_ws/install/setup.bash && sleep 10 && ros2 launch direct_lidar_inertial_odometry dlio.launch.py namespace:={veh}", # Pane 6
+        f"sleep 10.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 7
+        f"sleep 10.0 && ros2 topic echo /{veh}" + gt_odom_topic, # Pane  8
+        "sleep 10.0 && ros2 topic echo /SQ01/goal", 
+        "zenoh_router", # Pane 10
     ]
     run_tmux_commands(session_name, commands)
+

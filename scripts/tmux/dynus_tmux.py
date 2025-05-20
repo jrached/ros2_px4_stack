@@ -2,6 +2,7 @@
 
 import subprocess
 import os 
+import argparse 
 
 def run_tmux_commands(session_name, commands):
     """
@@ -48,6 +49,13 @@ if __name__ == "__main__":
     veh = os.environ.get("VEH_NAME")
     mav_id = os.environ.get("MAV_SYS_ID")
     session_name = f"{veh}_tmux_session"
+
+    # Get odom_type parameters from user 
+    parser = argparse.ArgumentParser() 
+    parser.add_argument('--odom_type', type=str, default="livox", help="Odometry measurement to send flight controller - motion capture or lidar")
+    args = parser.parse_args()
+    odom_type = args.odom_type 
+
     commands = [
         f"source ~/code/dynus_ws/install/setup.bash && source ~/code/decomp_ws/install/setup.bash && sleep 10 && ros2 launch dynus onboard_dynus.launch.py x:=0.0 y:=0.0 z:=0.0 yaw:=0 namespace:={veh} use_obstacle_tracker:=true use_ground_robot:=false use_hardware:=true " \
         "use_onboard_localization:=true depth_camera_name:=d455",  # Command for pane 1
@@ -60,7 +68,7 @@ if __name__ == "__main__":
 
         f"sleep 5.0 && ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}", # Pane 5
 
-        f"source ~/code/dynus_ws/install/setup.bash && sleep 10 && source ~/code/get_init_pose.sh && ros2 launch ros2_px4_stack dynus_mavros.launch.py", # Pane 6
+        f"source ~/code/dynus_ws/install/setup.bash && sleep 10 && source ~/code/get_init_pose.sh && ros2 launch ros2_px4_stack dynus_mavros.launch.py odom_type:={odom_type}", # Pane 6
         # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag*", # Pane 7
         # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag* && ros2 bag record  /PX01/world /tf /tf_static {veh}/tracked_obstacles {veh}/cluster_bounding_boxes {veh}/uncertainty_spheres", # Pane 7
 
