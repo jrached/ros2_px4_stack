@@ -35,7 +35,8 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             name=f'{veh}_odom_to_mocap',
-            arguments=[init_x, init_y, init_z, init_yaw, '0.0', '0.0', 'world_mocap', f'{veh}/init_pose'] 
+            # arguments=[init_x, init_y, init_z, init_yaw, '0.0', '0.0', 'world_mocap', f'{veh}/init_pose'] 
+            arguments=[init_x, init_y, init_z, init_yaw, init_pitch, init_roll, 'world_mocap', f'{veh}/init_pose'] 
         ),
         Node(
             package='tf2_ros',

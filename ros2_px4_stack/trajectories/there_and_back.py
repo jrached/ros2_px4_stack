@@ -54,6 +54,9 @@ class ThereAndBackAgain(Node):
         timer_period = 1 / 10
         self.timer = self.create_timer(timer_period, self.get_transform)
 
+        # Number of trips 
+        self.num_trips = 0 
+        self.max_num_trips = 1
 
 
     def get_transform(self):
@@ -92,10 +95,14 @@ class ThereAndBackAgain(Node):
                 
             if self.goal_af and self.reached_goal(state):
                 # Change goal 
-                if self.goal == (self.x_init, self.y_init, self.z_term_goal):
+                if self.num_trips >= self.max_num_trips: 
+                    return
+                    # self.goal = (self.x_init, self.y_init, self.z_term_goal)
+                elif self.goal == (self.x_init, self.y_init, self.z_term_goal):
                     self.goal = (self.x_term_goal, self.y_term_goal, self.z_term_goal)
                 elif self.goal == (self.x_term_goal, self.y_term_goal, self.z_term_goal):
                     self.goal = (self.x_init, self.y_init, self.z_term_goal)
+                    self.num_trips += 1 
 
                 # Publish new goal in global frame 
                 new_goal = PoseStamped() 
