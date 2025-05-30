@@ -7,6 +7,8 @@ from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped 
 from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy 
 from tf2_ros import Buffer, TransformListener, TransformBroadcaster
+from rclpy.time import Time
+
 
 class ThereAndBackAgain(Node):
     def __init__(self, x, y, z):
@@ -62,10 +64,10 @@ class ThereAndBackAgain(Node):
     def get_transform(self):
         # Get initial pose from static transform 
         if not self.init_pose_tf:
-            while not self.tf_buffer.lookup_transform("world_mocap", f"{self.veh}/init_pose", self.get_clock().now()):
+            while not self.tf_buffer.lookup_transform("world_mocap", f"{self.veh}/init_pose", Time()):
                 self.get_logger().info("Waiting on init_pose transform")
             
-            self.init_pose_tf = self.tf_buffer.lookup_transform("world_mocap", f"{self.veh}/init_pose", self.get_clock().now())
+            self.init_pose_tf = self.tf_buffer.lookup_transform("world_mocap", f"{self.veh}/init_pose", Time())
             translation = self.init_pose_tf.transform.translation
             self.x_init = translation.x 
             self.y_init = translation.y 
