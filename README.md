@@ -1,55 +1,25 @@
 # ros2_px4_stack
-Migration of uwb_drone_experiments to ros2
+Mavros interface for ACL hardware experiments 
 
-# Pixhawk Setup
-
-1. On your pc install PX-Autopilot:
-    https://docs.px4.io/main/en/dev_setup/building_px4.html 
-    
-   You should just have to run: 
-
-   git clone https://github.com/PX4/PX4-Autopilot.git --recursive
-
-   The rest of the guide is for reference.
-
-2. Then connect the pixhawk to your pc via usb and follow this guide to download QGroundControl, load the PX4-Autopilot firmware into the pixhawk, and configure the flight controller.
-
-    https://docs.px4.io/main/en/config/ 
+# Software setup
+To install the necessary software for the Dynus planner, follow the instructions in this repo: 
+[Dynus Installation](https://github.com/jrached/dynus_setup)
 
 
-# Companion Computer Setup
+# Running Dynus
 
-1. On the companion computer, install ROS2 Humble:
-    https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html 
+Note: This software uses lidar for state estimation and expects an initial position in a global reference frame (from say a motion capture system) in order to align the coordinate frames of the agents. 
 
-2. Install Mavros following the installation section of this readme: 
-    https://github.com/mavlink/mavros/blob/ros2/mavros/README.md
-    
-    Make sure to get the release for the humble distribution.
+1. On a vehicle, from the root of this project, run: 
+    ```
+    python3 scripts/tmux/dynus_tmux.py 
+    ```
+2. Arm the vehicle.
+3. Then source the workspace and run: 
+    ```
+    ros2 run ros2_px4_stack there_and_back.py 1.0 3.0 2.0 
+    ```
 
-3. Create a workspace:
-    mkdir -p mavros_ws/src
-
-4. Inside the mavros_ws/src directory, git clone this repo:
-
-    git clone https://github.com/jrached/uwb_drone_experiments.git
-
-
-# Running the code
-
-Note: This code assumes some form of position estimate being published to the PX01/world topic.
-
-1. Connect Pixhawk and Nuc through usbc
-2. Ssh into nuc
-3. Run: 
-    1. ros2 launch mavros px4.launch 
-    2. ros2 launch uwb_drone_experiments offboard_square_example.launch.py
-4. You should be able to echo (and they should be the same):
-    1. /mavros/vision_pose/pose
-    2. /mavros/local_position/pose
-5. On QGroundControl:
-    1. Connect transmitter.
-    2. Change mode to Offboard.
-    3. Arm the vehicle.
+    Where {x, y, z} = {1.0, 3.0, 2.0} is an arbitrary global position goal.
 
 

@@ -1,12 +1,5 @@
 #! /usr/bin/env python3
-"""A script to republish motion capture data from a ROS topic to a different topic."""
-
-"""
-Juan Notes:
-    1. Might want to remove "/optitrack" from mocap_sub_topic_name (just /PX01/world) 
-    2. Might have some issues with threading and global executors.
-       Go back to humble ros2 python migrating guide to look at their code.
-"""
+"""A script to republish motion capture data from a ROS topic to the PX4 flight controller state estimate topic."""
 
 import rclpy
 from rclpy.node import Node
