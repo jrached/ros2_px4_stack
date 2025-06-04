@@ -5,7 +5,8 @@ Mavros interface for ACL hardware experiments
 1. Trajectory Generator 
 2. Dynus 
 
-For the Dynus planner switch to the dynus branch
+Use this branch for the trajectory generator.
+For the Dynus planner switch to the dynus branch:
 ```
 git switch dynus 
 ```
