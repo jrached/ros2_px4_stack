@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
         f"sleep 5.0 && ros2 launch mavros px4.launch namespace:={veh}/mavros tgt_system:={mav_id}", # Pane 5
 
-        f"source ~/code/dynus_ws/install/setup.bash && sleep 10 && source ~/code/get_init_pose.sh && ros2 launch ros2_px4_stack dynus_mavros.launch.py odom_type:={odom_type}", # Pane 6
+        f"source ~/code/dynus_ws/install/setup.bash && sleep 10 && source ~/code/mavros_ws/src/ros2_px4_stack/scripts/trajectories/get_init_pose.sh && ros2 launch ros2_px4_stack dynus_mavros.launch.py odom_type:={odom_type}", # Pane 6
         # f"sleep 30.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/code/data/bags && rm -rf rosbag*", # Pane 7
         # f"sleep 10.0 && source ~/code/dynus_ws/install/setup.bash && cd ~/data && rm -rf * && ros2 bag record -a -o twist_bag", # Pane 7 # /tf /tf_static
 
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         
         f"sleep 15.0 && ros2 topic echo {veh}/mavros/local_position/pose", # Pane 8 
 
-        'sleep 10.0 && source ~/code/get_init_pose.sh && echo && echo "init pos: (${INIT_X}, ${INIT_Y}, ${INIT_Z})" && echo "init att: (${INIT_ROLL}, ${INIT_PITCH}, ${INIT_YAW})" && echo', # Pane 9
+        'sleep 10.0 && source ~/code/mavros_ws/src/ros2_px4_stack/scripts/trajectories/get_init_pose.sh && echo && echo "init pos: (${INIT_X}, ${INIT_Y}, ${INIT_Z})" && echo "init att: (${INIT_ROLL}, ${INIT_PITCH}, ${INIT_YAW})" && echo', # Pane 9
 
         f"zenoh_router", # Pane 10
         f"ros2 launch global_mapper_ros global_mapper_node.launch.py quad:={veh} depth_pointcloud_topic:=livox/lidar",
