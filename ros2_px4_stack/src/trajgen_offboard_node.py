@@ -1,11 +1,5 @@
 #! /usr/bin/env python3
 
-"""
-I'm commenting out the rclpy.sleep() functions because they don't have a 
-ros2 equivalent (what rate are they sleeping on?). If this causes any trouble
-we can try uncommenting the hacky wait_for_seconds() method and using that instead.
-Be careful because the function is blocking and ros might yell at you 
-"""
 
 import rclpy
 from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy
