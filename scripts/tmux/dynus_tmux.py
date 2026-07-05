@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
         f"zenoh_router", # Pane 10
         
-        #f"ros2 launch global_mapper_ros global_mapper_node.launch.py quad:={veh} depth_pointcloud_topic:=livox/lidar",
+        #f"source ~/code/mapping_ws/install/setup.bash && ros2 launch global_mapper_ros global_mapper_node.launch.py quad:={veh} depth_pointcloud_topic:=livox/lidar",
     ]
     run_tmux_commands(session_name, commands)
 
